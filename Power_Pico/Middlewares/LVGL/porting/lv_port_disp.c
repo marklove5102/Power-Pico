@@ -107,7 +107,9 @@ void lv_port_disp_init(void)
 static void disp_init(void)
 {
     /*You code here*/
-
+    LCD_Init();
+    LCD_Fill(0,0, LCD_W, LCD_H, BLACK);
+    LCD_Set_Light(50);
 }
 
 volatile bool disp_flush_enabled = true;

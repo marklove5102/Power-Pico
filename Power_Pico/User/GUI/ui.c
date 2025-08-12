@@ -5,6 +5,8 @@
 
 ///////////////////// VARIABLES ////////////////////
 
+// pages
+
 
 ///////////////////// TEST LVGL SETTINGS ////////////////////
 #if LV_COLOR_DEPTH != 16
@@ -29,12 +31,14 @@ void ui_init(void)
                                                true, LV_FONT_DEFAULT);
     lv_disp_set_theme(dispp, theme);
     PageManager_init();
+
     // PageManager_register(&xxxpage);
     // test
     lv_obj_t * test_page = lv_obj_create(NULL);
     lv_obj_t * btn1 = lv_button_create(test_page);
     lv_obj_align(btn1, LV_ALIGN_CENTER, 0, 0);
     lv_disp_load_scr(test_page);
+
     //timer
     lv_timer_t * ui_MainTimer = lv_timer_create(main_timer, 1000,  NULL);
 }
