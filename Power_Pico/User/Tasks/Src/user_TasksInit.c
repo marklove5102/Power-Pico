@@ -10,7 +10,8 @@
 
 //tasks
 #include "user_HardwareInitTask.h"
-
+#include "user_SendTask.h"
+#include "user_KeyTask.h"
 
 /* Private typedef -----------------------------------------------------------*/
 
@@ -34,12 +35,12 @@ const osThreadAttr_t HardwareInitTask_attributes = {
   .priority = (osPriority_t) osPriorityHigh3,
 };
 
-//LVGL Handler task
-osThreadId_t LvHandlerTaskHandle;
-const osThreadAttr_t LvHandlerTask_attributes = {
-  .name = "LvHandlerTask",
-  .stack_size = 128 * 24,
-  .priority = (osPriority_t) osPriorityLow,
+//UART send task
+osThreadId_t UartSendTaskHandle;
+const osThreadAttr_t UartSendTask_attributes = {
+  .name = "UartSendTask",
+  .stack_size = 128 * 1,
+  .priority = (osPriority_t) osPriorityHigh1,
 };
 
 //Key task
@@ -48,6 +49,14 @@ const osThreadAttr_t KeyTask_attributes = {
   .name = "KeyTask",
   .stack_size = 128 * 1,
   .priority = (osPriority_t) osPriorityNormal,
+};
+
+//LVGL Handler task
+osThreadId_t LvHandlerTaskHandle;
+const osThreadAttr_t LvHandlerTask_attributes = {
+  .name = "LvHandlerTask",
+  .stack_size = 128 * 24,
+  .priority = (osPriority_t) osPriorityLow,
 };
 
 
@@ -72,13 +81,13 @@ void User_Tasks_Init(void)
   /* start timers, add new ones, ... */
 
   /* add queues, ... */
-	Key_MessageQueue  = osMessageQueueNew(1, 1, NULL);
+	Key_MessageQueue  = osMessageQueueNew(4, 1, NULL);
 
 	/* add threads, ... */
   HardwareInitTaskHandle  = osThreadNew(HardwareInitTask, NULL, &HardwareInitTask_attributes);
+  UartSendTaskHandle      = osThreadNew(UartSendTask, NULL, &UartSendTask_attributes);
+  KeyTaskHandle 			    = osThreadNew(KeyTask, NULL, &KeyTask_attributes);
   LvHandlerTaskHandle     = osThreadNew(LvHandlerTask, NULL, &LvHandlerTask_attributes);
-	// KeyTaskHandle 			 = osThreadNew(KeyTask, NULL, &KeyTask_attributes);
-
 
   /* add events, ... */
 
