@@ -22,6 +22,9 @@
 
 /* USER CODE BEGIN 0 */
 
+// cur 5mr, cur 500mr, cur 50r, voltage
+uint16_t adc_buf[ADC_TIMES][ADC_CHANELS];
+
 /* USER CODE END 0 */
 
 ADC_HandleTypeDef hadc1;

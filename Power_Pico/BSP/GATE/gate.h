@@ -16,9 +16,9 @@ extern "C" {
 #define EN2_PIN     GPIO_PIN_15
 
 //
-#define HIGH_CUR 0
+#define HIGH_CUR 2
 #define MID_CUR 1
-#define LOW_CUR 2
+#define LOW_CUR 0
 
 void Gate_Port_Init(void);
 void flow_route_selection(uint8_t selection);

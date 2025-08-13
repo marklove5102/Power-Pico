@@ -29,7 +29,10 @@ extern "C" {
 #include "main.h"
 
 /* USER CODE BEGIN Includes */
-
+#define ADC_TIMES 10
+#define ADC_CHANELS 4
+// cur 5mr, cur 500mr, cur 50r, val
+extern uint16_t adc_buf[ADC_TIMES][ADC_CHANELS];
 /* USER CODE END Includes */
 
 extern ADC_HandleTypeDef hadc1;
