@@ -22,8 +22,10 @@
 
 /* USER CODE BEGIN 0 */
 
+ADC_Packet adc_packet1, adc_packet2;
 // cur 5mr, cur 500mr, cur 50r, voltage
-uint16_t adc_buf[ADC_TIMES][ADC_CHANELS];
+uint16_t adc_buf1[ADC_TIMES+1][ADC_CHANELS];
+uint16_t adc_buf2[ADC_TIMES+1][ADC_CHANELS];
 
 /* USER CODE END 0 */
 
@@ -100,7 +102,7 @@ void MX_ADC1_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN ADC1_Init 2 */
-
+  __HAL_DMA_ENABLE_IT(&hdma_adc1, DMA_IT_TC); /*开启DMA传输完成中断*/
   /* USER CODE END ADC1_Init 2 */
 
 }
@@ -144,7 +146,7 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* adcHandle)
     hdma_adc1.Init.MemInc = DMA_MINC_ENABLE;
     hdma_adc1.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
     hdma_adc1.Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;
-    hdma_adc1.Init.Mode = DMA_CIRCULAR;
+    hdma_adc1.Init.Mode = DMA_NORMAL;
     hdma_adc1.Init.Priority = DMA_PRIORITY_LOW;
     hdma_adc1.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
     if (HAL_DMA_Init(&hdma_adc1) != HAL_OK)
