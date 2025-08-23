@@ -10,7 +10,7 @@
 
 //tasks
 #include "user_HardwareInitTask.h"
-#include "user_SendTask.h"
+#include "user_DataTask.h"
 #include "user_KeyTask.h"
 
 /* Private typedef -----------------------------------------------------------*/
@@ -35,10 +35,10 @@ const osThreadAttr_t HardwareInitTask_attributes = {
   .priority = (osPriority_t) osPriorityHigh3,
 };
 
-//UART send task
-osThreadId_t UartSendTaskHandle;
-const osThreadAttr_t UartSendTask_attributes = {
-  .name = "UartSendTask",
+//Data process task
+osThreadId_t DataTaskHandle;
+const osThreadAttr_t DataTask_attributes = {
+  .name = "DataTask",
   .stack_size = 128 * 2,
   .priority = (osPriority_t) osPriorityHigh1,
 };
@@ -85,7 +85,7 @@ void User_Tasks_Init(void)
 
 	/* add threads, ... */
   HardwareInitTaskHandle  = osThreadNew(HardwareInitTask, NULL, &HardwareInitTask_attributes);
-  UartSendTaskHandle      = osThreadNew(UartSendTask, NULL, &UartSendTask_attributes);
+  DataTaskHandle          = osThreadNew(DataTask, NULL, &DataTask_attributes);
   KeyTaskHandle 			    = osThreadNew(KeyTask, NULL, &KeyTask_attributes);
   LvHandlerTaskHandle     = osThreadNew(LvHandlerTask, NULL, &LvHandlerTask_attributes);
 
