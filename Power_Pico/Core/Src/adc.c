@@ -23,9 +23,6 @@
 /* USER CODE BEGIN 0 */
 
 ADC_Packet adc_packet1, adc_packet2;
-// cur 5mr, cur 500mr, cur 50r, voltage
-uint16_t adc_buf1[ADC_TIMES+1][ADC_CHANELS];
-uint16_t adc_buf2[ADC_TIMES+1][ADC_CHANELS];
 
 /* USER CODE END 0 */
 
