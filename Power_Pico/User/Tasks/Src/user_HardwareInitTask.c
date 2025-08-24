@@ -49,18 +49,13 @@ void HardwareInitTask(void *argument)
     // HAL_UART_Transmit_DMA(&huart6,(uint8_t *)"power-pico\r\n",13);
 
     // ADC
-    HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc_packet1.data, ADC_TIMES * ADC_CHANELS); /*启动ADC的DMA传输，配合定时器触发ADC转换  12位的ADC对应0-4095 */
+    HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc_packet.data, ADC_TIMES * ADC_CHANELS); /*启动ADC的DMA传输，配合定时器触发ADC转换  12位的ADC对应0-4095 */
     HAL_TIM_Base_Start(&htim2); /*开启定时器，用溢出时间来触发ADC*/
 
-    adc_packet1.header[0] = 0x55;
-    adc_packet1.header[1] = 0xAA;
-    adc_packet1.header[2] = ADC_TIMES;
-    adc_packet1.header[3] = ADC_CHANELS;
-
-    adc_packet2.header[0] = 0x55;
-    adc_packet2.header[1] = 0xAA;
-    adc_packet1.header[2] = ADC_TIMES;
-    adc_packet1.header[3] = ADC_CHANELS;
+    adc_packet.header[0] = 0x55;
+    adc_packet.header[1] = 0xAA;
+    adc_packet.header[2] = ADC_TIMES;
+    adc_packet.header[3] = ADC_CHANELS;
 
     // gate, for current flow route selection, high current by default
     Gate_Port_Init();
