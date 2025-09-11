@@ -3,4 +3,4 @@
 
 # 忽略所有位置的 .vscode 目录
 **/.vscode/
-
+**/.settings/
