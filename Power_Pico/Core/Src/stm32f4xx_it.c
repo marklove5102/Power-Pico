@@ -24,6 +24,7 @@
 /* USER CODE BEGIN Includes */
 #include "usart.h"
 #include "adc.h"
+#include "gate.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -204,11 +205,7 @@ void DMA2_Stream0_IRQHandler(void)
   /* USER CODE BEGIN DMA2_Stream0_IRQn 0 */
   if(__HAL_DMA_GET_FLAG(&hdma_adc1, DMA_FLAG_TCIF0_4)) {
       __HAL_DMA_CLEAR_FLAG(&hdma_adc1, DMA_FLAG_TCIF0_4);
-      HAL_ADC_Stop_DMA(&hadc1);
-      // 填充模式位
-      adc_packet.header[4] = 0x10;
-      HAL_UART_Transmit_DMA(&huart6, (uint8_t *)&adc_packet, sizeof(adc_packet));
-      HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc_packet.data, ADC_TIMES * ADC_CHANELS);
+      Gate_Swich_and_UART_Send(adc_packet);
   }
   /* USER CODE END DMA2_Stream0_IRQn 0 */
   HAL_DMA_IRQHandler(&hdma_adc1);

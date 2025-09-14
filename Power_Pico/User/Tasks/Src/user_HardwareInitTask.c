@@ -54,10 +54,8 @@ void HardwareInitTask(void *argument)
 
     adc_packet.header[0] = 0x55;
     adc_packet.header[1] = 0xAA;
-    adc_packet.header[2] = ADC_TIMES;
-    adc_packet.header[3] = ADC_CHANELS;
     // 填充模式位
-    adc_packet.header[4] = 0x10;
+    adc_packet.header[2] = 0x03;
 
     // gate, for current flow route selection, high current by default
     Gate_Port_Init();
