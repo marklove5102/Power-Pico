@@ -1,8 +1,21 @@
 #include "gate.h"
+#include "data_queue.h"
 #include "usart.h"
 #include "math.h"
 
+// 量程阈值
+#define ADC_TRUST_MAX 4000
+#define THRESH_HIGH 1900
+#define THRESH_LOW  18
+// 次数
+#define THRESH_TIMES 8
+
 uint8_t gate_status = HIGH_CUR; // Default status
+
+// 预先计算标度因子
+static double SCALE_LOW  = 3.0f / 4096.0f / 50.0f / LOW_CUR_RES *  1000000.0; // uA
+static double SCALE_MID  = 3.0f / 4096.0f / 50.0f / MID_CUR_RES *  1000000.0; // uA
+static double SCALE_HIGH  = 3.0f / 4096.0f / 50.0f / HIGH_CUR_RES * 1000000.0; // uA
 
 void Gate_Port_Init(void)
 {
@@ -60,7 +73,7 @@ uint8_t Gate_get_status(void)
   return gate_status;
 }
 
-// DMA中断中执行, 不能有阻塞
+// 在DMA中断中执行, 不能有阻塞
 void Gate_Swich_and_UART_Send(ADC_Packet adc_packet)
 {
   static uint8_t high_times = 0;
@@ -79,24 +92,32 @@ void Gate_Swich_and_UART_Send(ADC_Packet adc_packet)
       break;
   }
   // 可信范围内
+  float voltage;
+  float current;
   if(cur_adc < ADC_TRUST_MAX) {
     adc_packet.header[3] = Gate_get_status();
-    HAL_UART_Transmit_DMA(&huart6, (uint8_t*)&adc_packet, sizeof(adc_packet));
+    ADC_Packet adc_packet_trans = adc_packet;
+    HAL_UART_Transmit_DMA(&huart6, (uint8_t*)&adc_packet_trans, sizeof(adc_packet));
     // 计算电压电流值
-    global_valtage = adc_packet.data[0][0] * 3.0f / 4096.0f * 11.0f; // 11 = (100+10)/10
+    voltage = adc_packet.data[0][0] * 3.0f / 4096.0f * 11.0f; // 11 = (100+10)/10
+    // 计算电流值
     if(Gate_get_status() == LOW_CUR) {
-      global_current = (adc_packet.data[0][1] - 2048) * (3.0f / 4096.0f / 50.0f / LOW_CUR_RES * 1000000.0f);
-      global_cur_unit = UNIT_UA;
+      current = adc_packet.data[0][1];
+      current = (current - 2048.0) * SCALE_LOW;
     }
     else if(Gate_get_status() == MID_CUR) {
-      global_current = (adc_packet.data[0][2] - 2048) * (3.0f / 4096.0f / 50.0f / MID_CUR_RES * 1000.0f);
-      global_cur_unit = UNIT_MA;
+      current = adc_packet.data[0][2];
+      current = (current - 2048.0) * SCALE_MID;
     }
     else if(Gate_get_status() == HIGH_CUR) {
-      global_current = (adc_packet.data[0][3] - 2048) * (3.0f / 4096.0f / 50.0f / HIGH_CUR_RES * 1000.0f);
-      global_cur_unit = UNIT_MA;
+      current = adc_packet.data[0][3];
+      current = (current - 2048.0) * SCALE_HIGH;
     }
-    // 超过量程
+    // 入队列
+    queue_push(global_voltage_queue, voltage);
+    queue_push(global_current_queue, current);
+    // 判断是否需要切换档位
+    // ADC码值超过量程
     uint16_t diff = abs((int)cur_adc - 2048);
     if(diff > THRESH_HIGH) {
       high_times++;
