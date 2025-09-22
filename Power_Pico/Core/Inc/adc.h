@@ -43,21 +43,6 @@ typedef struct {
 
 extern ADC_Packet adc_packet;
 
-#define UNIT_UA 0
-#define UNIT_MA 1
-
-// 量程阈值
-#define ADC_TRUST_MAX 4000
-#define THRESH_HIGH 1900
-#define THRESH_LOW  18
-
-// 次数
-#define THRESH_TIMES 10
-
-extern uint8_t global_cur_unit;
-extern float global_valtage;
-extern float global_current;
-
 /* USER CODE END Includes */
 
 extern ADC_HandleTypeDef hadc1;
@@ -69,8 +54,6 @@ extern ADC_HandleTypeDef hadc1;
 void MX_ADC1_Init(void);
 
 /* USER CODE BEGIN Prototypes */
-
-void get_global_val_cur(float *valtage, float *current, uint8_t *cur_unit);
 
 /* USER CODE END Prototypes */
 
