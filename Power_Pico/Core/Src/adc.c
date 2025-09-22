@@ -24,10 +24,6 @@
 
 ADC_Packet adc_packet;
 
-uint8_t global_cur_unit = UNIT_MA; // default mA
-float global_valtage = 0.0;
-float global_current = 0.0;
-
 /* USER CODE END 0 */
 
 ADC_HandleTypeDef hadc1;
@@ -193,10 +189,5 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* adcHandle)
 }
 
 /* USER CODE BEGIN 1 */
-void get_global_val_cur(float *valtage, float *current, uint8_t *cur_unit)
-{
-    *valtage = global_valtage;
-    *current = global_current;
-    *cur_unit = global_cur_unit;
-}
+
 /* USER CODE END 1 */
