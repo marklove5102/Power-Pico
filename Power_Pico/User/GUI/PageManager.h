@@ -11,6 +11,7 @@ typedef struct {
     void (*init)(void);
     void (*deinit)(void);
     lv_obj_t** page_obj;  // 指向页面对象指针的指针
+    void (*key_event_handler)(uint8_t key_id); // 按键事件处理函数
     const char* name;     // 可选：用于调试
 } Page_t;
 
@@ -27,10 +28,11 @@ extern PageManager_t PageManager;
 // API 函数声明
 void PageManager_init(void);
 void PageManager_register(Page_t* page);
+void PageManager_load_init_screen(void);
 void PageManager_next(void);
 void PageManager_prev(void);
 void PageManager_goto(uint8_t index);
 Page_t* PageManager_get_current_page(void);
-void PageManager_load_init_screen(void);
+void PageManager_handle_key_event(uint8_t key_id);
 
 #endif // PAGE_MANAGER_H

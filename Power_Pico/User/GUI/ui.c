@@ -12,6 +12,7 @@ Page_t pages[] = {
         .init = ui_main_screen_init,
         .deinit = ui_main_screen_destroy,
         .page_obj = &ui_HomeScreen,
+        .key_event_handler = ui_main_page_key_handler,
         .name = "Main Page"
     },
     // 可以在这里添加更多页面
@@ -28,6 +29,7 @@ Page_t pages[] = {
  */
 static void main_timer(lv_timer_t * timer)
 {
+    // do nothing
     // LV_LOG_WARN("Main timer");
 }
 

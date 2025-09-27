@@ -100,3 +100,16 @@ Page_t* PageManager_get_current_page(void) {
     if (PageManager.count == 0) return NULL;
     return PageManager.pages[PageManager.current_index];
 }
+
+/**
+ * 处理按键事件，调用当前页面的按键事件处理函数
+ * @param key_id 按键ID
+ */
+void PageManager_handle_key_event(uint8_t key_id) {
+    Page_t* current_page = PageManager_get_current_page();
+    if (current_page && current_page->key_event_handler) {
+        current_page->key_event_handler(key_id); // 调用当前页面的按键事件处理函数
+    } else {
+        printf("No key event handler for current page\n");
+    }
+}

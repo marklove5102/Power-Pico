@@ -223,3 +223,8 @@ void ui_main_screen_destroy(void)
     _flush_timer = NULL;
 
 }
+
+void ui_main_page_key_handler(uint8_t key_id)
+{
+    // nothing to do
+}
