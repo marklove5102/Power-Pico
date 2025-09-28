@@ -8,17 +8,17 @@
 #include "data_queue.h"
 
 lv_obj_t * ui_HomeScreen = NULL;
-lv_obj_t * ui_ButVal = NULL;
-lv_obj_t * ui_LabelUnitVal = NULL;
-lv_obj_t * ui_LabelValt = NULL;
-lv_obj_t * ui_ButCur = NULL;
-lv_obj_t * ui_LabelUnitCur = NULL;
-lv_obj_t * ui_LabelCur = NULL;
-lv_obj_t * ui_ButEnerge = NULL;
-lv_obj_t * ui_LabelUnitEnerge = NULL;
-lv_obj_t * ui_LabelEnerge = NULL;
-lv_obj_t * ui_ButTime = NULL;
-lv_obj_t * ui_LabelTime = NULL;
+static lv_obj_t * ui_ButVal = NULL;
+static lv_obj_t * ui_LabelUnitVal = NULL;
+static lv_obj_t * ui_LabelValt = NULL;
+static lv_obj_t * ui_ButCur = NULL;
+static lv_obj_t * ui_LabelUnitCur = NULL;
+static lv_obj_t * ui_LabelCur = NULL;
+static lv_obj_t * ui_ButEnerge = NULL;
+static lv_obj_t * ui_LabelUnitEnerge = NULL;
+static lv_obj_t * ui_LabelEnerge = NULL;
+static lv_obj_t * ui_ButTime = NULL;
+static lv_obj_t * ui_LabelTime = NULL;
 static lv_timer_t * _flush_timer = NULL;
 
 // other funtions
