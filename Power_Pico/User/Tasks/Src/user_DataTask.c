@@ -26,10 +26,6 @@ void DataTask(void *argument)
   uint16_t cur_bias = 4096 / 2;
 	while(1)
 	{
-    if(osMessageQueueGet(Key_MessageQueue, &keystr, NULL, 0)==osOK)
-		{
-      // UART6_TX_Send((uint8_t *)"key pressed\r\n", 13);
-    }
 
     // over current and valtage, beep
 
