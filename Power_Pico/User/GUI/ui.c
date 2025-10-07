@@ -3,6 +3,7 @@
 
 #include "./ui.h"
 #include "./screens/ui_mainPage.h"
+#include "./screens/ui_chartPage.h"
 
 ///////////////////// VARIABLES ////////////////////
 
@@ -14,6 +15,13 @@ Page_t pages[] = {
         .page_obj = &ui_HomeScreen,
         .key_event_handler = ui_main_page_key_handler,
         .name = "Main Page"
+    },
+    {
+        .init = ui_ChartPage_screen_init,
+        .deinit = ui_ChartPage_screen_destroy,
+        .page_obj = &ui_ChartPage,
+        .key_event_handler = ui_chart_page_key_handler,
+        .name = "Chart Page"
     },
     // 可以在这里添加更多页面
 };
@@ -47,5 +55,5 @@ void ui_init(void)
     PageManager_load_init_screen();
 
     //timer
-    lv_timer_t * ui_MainTimer = lv_timer_create(main_timer, 1000,  NULL);
+    // lv_timer_t * ui_MainTimer = lv_timer_create(main_timer, 1000,  NULL);
 }
