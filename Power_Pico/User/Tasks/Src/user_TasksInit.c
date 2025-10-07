@@ -7,6 +7,7 @@
 
 //gui
 #include "lvgl.h"
+#include "PageManager.h"
 
 //tasks
 #include "user_HardwareInitTask.h"
@@ -85,7 +86,7 @@ void User_Tasks_Init(void)
 
 	/* add threads, ... */
   HardwareInitTaskHandle  = osThreadNew(HardwareInitTask, NULL, &HardwareInitTask_attributes);
-  DataTaskHandle          = osThreadNew(DataTask, NULL, &DataTask_attributes);
+  // DataTaskHandle          = osThreadNew(DataTask, NULL, &DataTask_attributes);
   KeyTaskHandle 			    = osThreadNew(KeyTask, NULL, &KeyTask_attributes);
   LvHandlerTaskHandle     = osThreadNew(LvHandlerTask, NULL, &LvHandlerTask_attributes);
 
@@ -116,8 +117,12 @@ void TaskTickHook(void)
   */
 void LvHandlerTask(void *argument)
 {
+  uint8_t keystr = 0;
   while(1)
   {
+    if(osMessageQueueGet(Key_MessageQueue, &keystr, NULL, 1)==osOK) {
+      PageManager_handle_key_event(keystr);
+    }
 		lv_task_handler();
     osDelay(1);
 	}

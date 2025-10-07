@@ -24,28 +24,10 @@ void KeyTask(void *argument)
 	while(1)
 	{
 		keystr = KeyScan(0);
-		switch(keystr)
+		if(keystr != 0)
 		{
-			case KEYB_NUM:
-				osMessageQueuePut(Key_MessageQueue, &keystr, 0, 1);
-				break;
-
-			case KEYY_NUM:
-				osMessageQueuePut(Key_MessageQueue, &keystr, 0, 1);
-				break;
-
-			case KEYL_NUM:
-				osMessageQueuePut(Key_MessageQueue, &keystr, 0, 1);
-				break;
-
-			case KEYR_NUM:
-				osMessageQueuePut(Key_MessageQueue, &keystr, 0, 1);
-				break;
-
-			case KEYN_NUM:
-				osMessageQueuePut(Key_MessageQueue, &keystr, 0, 1);
-				break;
+			osMessageQueuePut(Key_MessageQueue, &keystr, 0, 1);
 		}
-		osDelay(1);
+		osDelay(10);
 	}
 }
