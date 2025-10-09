@@ -109,7 +109,7 @@ int main(void)
   //key_boot
 	Key_Port_Init();
 
-	//PWM Start
+	// PWM Start for LCD backlight
 	HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3);
 
 	//lcd
@@ -125,7 +125,7 @@ int main(void)
     delay_ms(500);
     if(HAL_GPIO_ReadPin(KEYB_PORT, KEYB_PIN) == 0)
     {
-      LCD_ShowString(72, LCD_H/2, (uint8_t*)"Bootload", WHITE, BLACK, 24, 0);//12*6,16*8,24*12,32*16
+      LCD_ShowString(72, LCD_H/3, (uint8_t*)"Bootload", WHITE, BLACK, 24, 0);//12*6,16*8,24*12,32*16
       //menu
       FLASH_If_Init();
       Main_Menu();
@@ -179,8 +179,8 @@ int main(void)
 		// no legal APP
 		else
 		{
-			LCD_ShowString(74, LCD_H/2, (uint8_t*)"No App!", WHITE, BLACK, 24, 0);//12*6,16*8,24*12,32*16
-      LCD_ShowString(32, LCD_H/2+48, (uint8_t*)"Please Download", WHITE, BLACK, 24, 0);
+			LCD_ShowString(74, LCD_H/3, (uint8_t*)"No App!", WHITE, BLACK, 24, 0);//12*6,16*8,24*12,32*16
+      LCD_ShowString(32, LCD_H/3+48, (uint8_t*)"Please Download", WHITE, BLACK, 24, 0);
 			HAL_Delay(1000);
 		}
   }

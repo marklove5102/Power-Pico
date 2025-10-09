@@ -4,7 +4,7 @@
 #include "delay.h"
 #include "spi.h"
 
-#define OFFSET_Y 0
+#define OFFSET_Y 80
 
 /******************************************************************************
       函数说明：在指定区域填充颜色
@@ -60,7 +60,7 @@ void LCD_Fill(u16 xsta,u16 ysta,u16 xend,u16 yend,u16 color)
 ******************************************************************************/
 void LCD_DrawPoint(u16 x,u16 y,u16 color)
 {
-	LCD_Address_Set(x,y,x,y);//设置光标位置
+	LCD_Address_Set(x,y+OFFSET_Y,x,y+OFFSET_Y);//设置光标位置
 	LCD_WR_DATA(color);
 }
 
@@ -201,7 +201,7 @@ void LCD_ShowChinese12x12(u16 x,u16 y,u8 *s,u16 fc,u16 bc,u8 sizey,u8 mode)
 	{
 		if((tfont12[k].Index[0]==*(s))&&(tfont12[k].Index[1]==*(s+1)))
 		{
-			LCD_Address_Set(x,y,x+sizey-1,y+sizey-1);
+			LCD_Address_Set(x,y+OFFSET_Y,x+sizey-1,y+sizey-1+OFFSET_Y);
 			for(i=0;i<TypefaceNum;i++)
 			{
 				for(j=0;j<8;j++)
@@ -258,7 +258,7 @@ void LCD_ShowChinese16x16(u16 x,u16 y,u8 *s,u16 fc,u16 bc,u8 sizey,u8 mode)
 	{
 		if ((tfont16[k].Index[0]==*(s))&&(tfont16[k].Index[1]==*(s+1)))
 		{
-			LCD_Address_Set(x,y,x+sizey-1,y+sizey-1);
+			LCD_Address_Set(x,y+OFFSET_Y,x+sizey-1,y+sizey-1+OFFSET_Y);
 			for(i=0;i<TypefaceNum;i++)
 			{
 				for(j=0;j<8;j++)
@@ -316,7 +316,7 @@ void LCD_ShowChinese24x24(u16 x,u16 y,u8 *s,u16 fc,u16 bc,u8 sizey,u8 mode)
 	{
 		if ((tfont24[k].Index[0]==*(s))&&(tfont24[k].Index[1]==*(s+1)))
 		{
-			LCD_Address_Set(x,y,x+sizey-1,y+sizey-1);
+			LCD_Address_Set(x,y+OFFSET_Y,x+sizey-1,y+sizey-1+OFFSET_Y);
 			for(i=0;i<TypefaceNum;i++)
 			{
 				for(j=0;j<8;j++)
@@ -373,7 +373,7 @@ void LCD_ShowChinese32x32(u16 x,u16 y,u8 *s,u16 fc,u16 bc,u8 sizey,u8 mode)
 	{
 		if ((tfont32[k].Index[0]==*(s))&&(tfont32[k].Index[1]==*(s+1)))
 		{
-			LCD_Address_Set(x,y,x+sizey-1,y+sizey-1);
+			LCD_Address_Set(x,y+OFFSET_Y,x+sizey-1,y+sizey-1+OFFSET_Y);
 			for(i=0;i<TypefaceNum;i++)
 			{
 				for(j=0;j<8;j++)
@@ -426,7 +426,7 @@ void LCD_ShowChar(u16 x,u16 y,u8 num,u16 fc,u16 bc,u8 sizey,u8 mode)
 	sizex=sizey/2;
 	TypefaceNum=(sizex/8+((sizex%8)?1:0))*sizey;
 	num=num-' ';    //得到偏移后的值
-	LCD_Address_Set(x,y,x+sizex-1,y+sizey-1);  //设置光标位置
+	LCD_Address_Set(x,y+OFFSET_Y,x+sizex-1,y+sizey-1+OFFSET_Y);  //设置光标位置
 	for(i=0;i<TypefaceNum;i++)
 	{
 		if(sizey==12)temp=ascii_1206[num][i];		       //调用6x12字体
@@ -571,7 +571,7 @@ void LCD_ShowPicture(u16 x,u16 y,u16 length,u16 width,const u8 pic[])
 {
 	u16 i,j;
 	u32 k=0;
-	LCD_Address_Set(x,y,x+length-1,y+width-1);
+	LCD_Address_Set(x,y+OFFSET_Y,x+length-1,y+width-1+OFFSET_Y);
 	for(i=0;i<length;i++)
 	{
 		for(j=0;j<width;j++)

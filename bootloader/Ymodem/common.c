@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @file    STM32F4xx_IAP/src/common.c 
+  * @file    STM32F4xx_IAP/src/common.c
   * @author  MCD Application Team
   * @version V1.0.0
   * @date    10-October-2011
@@ -17,7 +17,7 @@
   *
   * <h2><center>&copy; COPYRIGHT 2011 STMicroelectronics</center></h2>
   ******************************************************************************
-  */ 
+  */
 
 /** @addtogroup STM32F4xx_IAP
   * @{
@@ -191,7 +191,7 @@ uint32_t SerialKeyPressed(uint8_t *key)
 {
   if (__HAL_UART_GET_FLAG(&huart6, UART_FLAG_RXNE) != RESET)
   {
-    *key = (uint16_t)((&huart6)->Instance->DR & (uint16_t)0x01FF);	  
+    *key = (uint16_t)((&huart6)->Instance->DR & (uint16_t)0x01FF);
      return 1;
   }
   else
@@ -227,7 +227,7 @@ uint8_t GetKey(void)
   */
 void SerialPutChar(uint8_t c)
 {
-  USART_SendData(USART1, c);
+  USART_SendData(USART6, c);
   while (__HAL_UART_GET_FLAG(&huart6, UART_FLAG_TXE) == RESET)
   {
   }
@@ -293,8 +293,8 @@ void USART_SendData(USART_TypeDef* USARTx, uint16_t Data)
 {
   /* Check the parameters */
   assert_param(IS_USART_ALL_PERIPH(USARTx));
-  assert_param(IS_USART_DATA(Data)); 
-    
+  assert_param(IS_USART_DATA(Data));
+
   /* Transmit Data */
   USARTx->DR = (Data & (uint16_t)0x01FF);
 }
