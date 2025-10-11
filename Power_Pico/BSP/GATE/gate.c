@@ -97,7 +97,7 @@ void Gate_Swich_and_UART_Send(ADC_Packet adc_packet)
   if(cur_adc < ADC_TRUST_MAX) {
     adc_packet.header[3] = Gate_get_status();
     ADC_Packet adc_packet_trans = adc_packet;
-    HAL_UART_Transmit_DMA(&huart6, (uint8_t*)&adc_packet_trans, sizeof(adc_packet));
+    HAL_UART_Transmit_DMA(&huart6, (uint8_t*)&adc_packet_trans, sizeof(adc_packet_trans));
     // 计算电压电流值
     voltage = adc_packet.data[0][0] * 3.0f / 4096.0f * 11.0f; // 11 = (100+10)/10
     // 计算电流值
