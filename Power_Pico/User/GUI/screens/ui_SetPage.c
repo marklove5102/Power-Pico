@@ -6,15 +6,19 @@
 #include "../ui.h"
 
 lv_obj_t * ui_SetPage = NULL;
+// backlight
 static lv_obj_t * ui_PanelBL = NULL;
 static lv_obj_t * ui_SliderBL = NULL;
 static lv_obj_t * ui_LabelBL = NULL;
+// key sound
 static lv_obj_t * ui_PanelKS = NULL;
 static lv_obj_t * ui_SwitchKS = NULL;
 static lv_obj_t * ui_LabelKS = NULL;
+// language
 static lv_obj_t * ui_PanelLang = NULL;
 static lv_obj_t * ui_SwitchLang = NULL;
 static lv_obj_t * ui_LabelLang = NULL;
+// about
 static lv_obj_t * ui_PanelAbout = NULL;
 static lv_obj_t * ui_LabelAbout = NULL;
 
@@ -177,7 +181,7 @@ void ui_SetPage_screen_init(void)
     lv_label_set_text(ui_LabelAbout, "About\nPower-Pico\nA uA current meter\nV 1.0.0");
     lv_obj_set_style_text_font(ui_LabelAbout, &lv_font_montserrat_16, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    //
+    // store panels in array
     panels[0] = ui_PanelBL;
     panels[1] = ui_PanelKS;
     panels[2] = ui_PanelLang;

@@ -3,6 +3,7 @@
 #include "user_TasksInit.h"
 #include "main.h"
 #include "key.h"
+#include "beep.h"
 
 /* Private typedef -----------------------------------------------------------*/
 
@@ -27,6 +28,13 @@ void KeyTask(void *argument)
 		if(keystr != 0)
 		{
 			osMessageQueuePut(Key_MessageQueue, &keystr, 0, 1);
+			// beep
+			if(1)
+			{
+				beep_open();
+				osDelay(50);
+				beep_close();
+			}
 		}
 		osDelay(10);
 	}
