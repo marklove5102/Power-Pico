@@ -21,22 +21,22 @@ extern "C" {
 
 //KEYY
 #define KEYY_PORT	GPIOA
-#define KEYY_PIN	GPIO_PIN_1
+#define KEYY_PIN	GPIO_PIN_4
 #define KEYY HAL_GPIO_ReadPin(KEYY_PORT,KEYY_PIN)
 
 //KEYL
 #define KEYL_PORT	GPIOA
-#define KEYL_PIN	GPIO_PIN_2
+#define KEYL_PIN	GPIO_PIN_3
 #define KEYL HAL_GPIO_ReadPin(KEYL_PORT,KEYL_PIN)
 
 //KEYR
 #define KEYR_PORT	GPIOA
-#define KEYR_PIN	GPIO_PIN_3
+#define KEYR_PIN	GPIO_PIN_2
 #define KEYR HAL_GPIO_ReadPin(KEYR_PORT,KEYR_PIN)
 
 //KEYN
 #define KEYN_PORT	GPIOA
-#define KEYN_PIN	GPIO_PIN_4
+#define KEYN_PIN	GPIO_PIN_1
 #define KEYN HAL_GPIO_ReadPin(KEYN_PORT,KEYN_PIN)
 
 void Key_Port_Init(void);
