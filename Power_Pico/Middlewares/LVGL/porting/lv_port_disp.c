@@ -134,10 +134,12 @@ void disp_disable_update(void)
  *'lv_display_flush_ready()' has to be called when it's finished.*/
 static void disp_flush(lv_display_t * disp_drv, const lv_area_t * area, uint8_t * px_map)
 {
-    lv_display_rotation_t rotation = lv_display_get_rotation(disp_drv);
+    static lv_display_rotation_t last_rotation = LV_DISPLAY_ROTATION_0;
+    lv_display_rotation_t current_rotation = lv_display_get_rotation(disp_drv);
     lv_area_t rotated_area;
-    if(rotation != LV_DISPLAY_ROTATION_0) {
-        LCD_SetRotation(rotation * 90);
+    if (current_rotation != last_rotation) {
+        LCD_SetRotation(current_rotation * 90); // 仅在旋转状态改变时调用
+        last_rotation = current_rotation;      // 更新上次状态
     }
     if(disp_flush_enabled) {
         LCD_Color_Render(area->x1,area->y1,area->x2,area->y2, (uint16_t *)px_map);

@@ -1,6 +1,13 @@
 #include "BL24C02.h"
 #include "i2c.h"
 
+SysSettings_T sys_settings = {
+	.backlight_level = 80,
+	.key_sound_enable = 1,
+	.language_select = 0,
+	.rotation = 0
+};
+
 static void BL24C02_Write(uint8_t addr, uint16_t length, uint8_t buff[])
 {
 	HAL_I2C_Mem_Write(&hi2c1, BL24C02_ADDRESS<<1, addr, I2C_MEMADD_SIZE_8BIT, buff, length, 10);

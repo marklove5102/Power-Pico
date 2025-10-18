@@ -184,24 +184,32 @@ void LCD_ST7789_SleepOut(void)
 	入口数据：rotation 0, 90, 180, 270
 	返回值：  无
 ******************************************************************************/
-void LCD_SetRotation(uint8_t rotation) {
+void LCD_SetRotation(uint16_t rotation) {
 	LCD_WR_REG(0x36); // Memory Data Access Control
 	switch(rotation) {
 		case 0:
+			OFFSET_X = 0;
 			OFFSET_Y = 0;
 			LCD_WR_DATA8(0x00);
 			break;
 		case 180:
+			OFFSET_X = 0;
 			OFFSET_Y = 80;
 			LCD_WR_DATA8(0xC0);
 			break;
 		case 90:
+			OFFSET_X = 0;
+			OFFSET_Y = 0;
 			LCD_WR_DATA8(0x70);
 			break;
 		case 270:
+			OFFSET_X = 80;
+			OFFSET_Y = 0;
 			LCD_WR_DATA8(0xA0);
 			break;
 		default:
+			OFFSET_X = 0;
+			OFFSET_Y = 0;
 			LCD_WR_DATA8(0x00);
 			break;
 	}

@@ -18,6 +18,7 @@
 #include "gate.h"
 #include "data_queue.h"
 #include "fusb302_dev.h"
+#include "BL24C02.h" // settings
 
 // ui
 #include "lvgl.h"
@@ -81,6 +82,12 @@ void HardwareInitTask(void *argument)
 
     // key
     Key_Port_Init();
+
+    // system settings from eeprom
+    sys_settings.backlight_level = 80;
+    sys_settings.key_sound_enable = 0;
+    sys_settings.language_select = 0;
+    sys_settings.rotation = 270;
 
     // FUSB CC pin dis connect
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_10, GPIO_PIN_RESET);

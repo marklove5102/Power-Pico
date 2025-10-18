@@ -1,6 +1,7 @@
 // LVGL version: 9.2
 // Project name: PowerPico
 
+#include "BL24C02.h" // system settings
 #include "./ui.h"
 #include "./screens/ui_mainPage.h"
 #include "./screens/ui_chartPage.h"
@@ -61,7 +62,7 @@ void ui_init(void)
         PageManager_register(&pages[i]);
     }
     PageManager_load_init_screen();
-    lv_display_set_rotation(dispp, LV_DISP_ROTATION_180);
+    lv_display_set_rotation(dispp, sys_settings.rotation / 90);
 
     //timer
     // lv_timer_t * ui_MainTimer = lv_timer_create(main_timer, 1000,  NULL);

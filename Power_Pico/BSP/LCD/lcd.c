@@ -15,7 +15,7 @@ extern osSemaphoreId_t DMA_SemaphoreHandle;
 void LCD_Fill(u16 xsta,u16 ysta,u16 xend,u16 yend,u16 color)
 {
 	u16 i,j;
-	LCD_Address_Set(xsta,ysta+OFFSET_Y,xend-1,yend-1+OFFSET_Y);//设置显示范围
+	LCD_Address_Set(xsta+OFFSET_X, ysta+OFFSET_Y,xend-1+OFFSET_X, yend-1+OFFSET_Y);//设置显示范围
 	for(i=ysta;i<yend;i++)
 	{
 		for(j=xsta;j<xend;j++)
@@ -39,7 +39,7 @@ void LCD_Color_Render(u16 xsta,u16 ysta,u16 xend,u16 yend,u16 *color_p)
 	height = yend-ysta+1;
 	uint32_t size = width * height;
 
-	LCD_Address_Set(xsta,ysta+OFFSET_Y,xend,yend+OFFSET_Y);
+	LCD_Address_Set(xsta+OFFSET_X, ysta+OFFSET_Y, xend+OFFSET_X, yend+OFFSET_Y);
 
 	hspi2.Init.DataSize = SPI_DATASIZE_16BIT;
 	hspi2.Instance->CR1|=SPI_CR1_DFF;

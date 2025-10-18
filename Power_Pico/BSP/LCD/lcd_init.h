@@ -59,6 +59,8 @@ void LCD_Close_Light(void);
 void LCD_ST7789_SleepIn(void);
 void LCD_ST7789_SleepOut(void);
 void LCD_Open_Light(void);
+void LCD_SetRotation(uint16_t rotation);
+
 #endif
 
 
