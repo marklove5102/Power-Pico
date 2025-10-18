@@ -4,10 +4,8 @@
 #include "math.h"
 
 // 量程阈值
-#define ADC_TRUST_MAX 1952
-#define ADC_TRUST_MIN 10
-#define THRESH_HIGH 1800
-#define THRESH_LOW  18
+#define THRESH_HIGH 4000-2048 // 对应550uA 50mA
+#define THRESH_LOW  15 // 对应大概450uA 45mA
 // 次数
 #define THRESH_TIMES 8
 
@@ -79,7 +77,9 @@ void Gate_Swich_and_UART_Send(ADC_Packet adc_packet)
 {
   static uint8_t high_times = 0;
   static uint8_t low_times = 0;
-  // low mid high
+  // adc码值
+  uint16_t ref_adc = adc_packet.data[0][4];
+  uint16_t vol_adc = adc_packet.data[0][0];
   uint16_t cur_adc = 0;
   switch(Gate_get_status()) {
     case LOW_CUR:
@@ -92,60 +92,52 @@ void Gate_Swich_and_UART_Send(ADC_Packet adc_packet)
       cur_adc = adc_packet.data[0][3];
       break;
   }
-  // 可信范围内
+  // 计算电压电流值
   float voltage;
   float current;
-  uint16_t diff = abs((int)cur_adc - 2048);
-  if(diff < ADC_TRUST_MAX && diff > ADC_TRUST_MIN) {
-    adc_packet.header[3] = Gate_get_status();
-    ADC_Packet adc_packet_trans = adc_packet;
-    HAL_UART_Transmit_DMA(&huart6, (uint8_t*)&adc_packet_trans, sizeof(adc_packet_trans));
-    // 计算电压电流值
-    voltage = adc_packet.data[0][0] * 3.0f / 4096.0f * 11.0f; // 11 = (100+10)/10
-    // 计算电流值
-    if(Gate_get_status() == LOW_CUR) {
-      current = adc_packet.data[0][1];
-      current = (current - 2048.0) * SCALE_LOW;
-    }
-    else if(Gate_get_status() == MID_CUR) {
-      current = adc_packet.data[0][2];
-      current = (current - 2048.0) * SCALE_MID;
-    }
-    else if(Gate_get_status() == HIGH_CUR) {
-      current = adc_packet.data[0][3];
-      current = (current - 2048.0) * SCALE_HIGH;
-    }
-    // 入队列
-    queue_push(global_voltage_queue, voltage);
-    queue_push(global_current_queue, current);
-    // 判断是否需要切换档位
-    // ADC码值超过量程
-    if(diff > THRESH_HIGH) {
-      high_times++;
-      low_times = 0;
-      if(high_times >= THRESH_TIMES) {
-        high_times = 0;
-        flow_route_selection(Gate_get_status()+1);
-      }
-    }
-    else if(diff < THRESH_LOW) {
-      low_times++;
+  uint16_t diff = abs((int)cur_adc - ref_adc);
+
+  adc_packet.header[3] = Gate_get_status();
+  ADC_Packet adc_packet_trans = adc_packet;
+  HAL_UART_Transmit_DMA(&huart6, (uint8_t*)&adc_packet_trans, sizeof(adc_packet_trans));
+  // 计算电压电流值
+  voltage = vol_adc * 3.0f / 4096.0f * 11.0f; // 11 = (100+10)/10
+  // 计算电流值
+  if(Gate_get_status() == LOW_CUR) {
+    current = adc_packet.data[0][1];
+    current = (current - ref_adc) * SCALE_LOW;
+  }
+  else if(Gate_get_status() == MID_CUR) {
+    current = adc_packet.data[0][2];
+    current = (current - ref_adc) * SCALE_MID;
+  }
+  else if(Gate_get_status() == HIGH_CUR) {
+    current = adc_packet.data[0][3];
+    current = (current - ref_adc) * SCALE_HIGH;
+  }
+  // 入队列
+  queue_push(global_voltage_queue, voltage);
+  queue_push(global_current_queue, current);
+  // 判断是否需要切换档位
+  // ADC码值超过量程
+  if(diff > THRESH_HIGH) {
+    high_times++;
+    low_times = 0;
+    if(high_times >= THRESH_TIMES) {
       high_times = 0;
-      if(low_times >= THRESH_TIMES) {
-        low_times = 0;
-        flow_route_selection(Gate_get_status()-1);
-      }
-    }
-    else {
-      high_times = 0;
-      low_times = 0;
+      flow_route_selection(Gate_get_status()+1);
     }
   }
-  // 不可信范围内
-  else {
-    if(diff >= ADC_TRUST_MAX) // 过大，切换到更大档位
-      flow_route_selection(Gate_get_status()+1);
-    else if(diff <= ADC_TRUST_MIN) // 过小，切换到更小档位
+  else if(diff < THRESH_LOW) {
+    low_times++;
+    high_times = 0;
+    if(low_times >= THRESH_TIMES) {
+      low_times = 0;
       flow_route_selection(Gate_get_status()-1);
+    }
+  }
+  else {
+    high_times = 0;
+    low_times = 0;
   }
 }

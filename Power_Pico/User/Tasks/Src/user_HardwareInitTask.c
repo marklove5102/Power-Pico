@@ -52,9 +52,9 @@ void HardwareInitTask(void *argument)
     // HAL_UART_Transmit_DMA(&huart6,(uint8_t *)"power-pico\r\n",13);
 
     // queue for voltage and current
-    global_voltage_queue = queue_create(8);
-    global_current_queue = queue_create(8);
-    for(int i = 0; i < 8; i++) {
+    global_voltage_queue = queue_create(32);
+    global_current_queue = queue_create(32);
+    for(int i = 0; i < 32; i++) {
       queue_push(global_voltage_queue, 0.0);
       queue_push(global_current_queue, 0.0);
     }

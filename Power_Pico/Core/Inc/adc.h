@@ -31,7 +31,7 @@ extern "C" {
 /* USER CODE BEGIN Includes */
 
 #define ADC_TIMES 1
-#define ADC_CHANELS 4
+#define ADC_CHANELS 5
 
 typedef struct {
   uint8_t  header[4]; //2的倍数
@@ -39,7 +39,7 @@ typedef struct {
   // 0x0A adc times, 0x05 adc channels (so data lenth is times * channels * 2 bytes)
   // 0x?0 for LOW, 0x?1 for MID, 0x?2 for HIGH.
   uint16_t data[ADC_TIMES][ADC_CHANELS];
-} __attribute__((packed)) ADC_Packet;
+} ADC_Packet;
 
 extern ADC_Packet adc_packet;
 
