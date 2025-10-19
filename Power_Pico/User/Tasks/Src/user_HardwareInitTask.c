@@ -46,11 +46,10 @@ void HardwareInitTask(void *argument)
     vTaskSuspendAll();
 
     // uart start
-    HAL_UART_Receive_DMA(&huart6, (uint8_t*)uart_receive_str, USART_RX_BUFFER_SIZE);
+    HAL_UART_Receive_DMA(&huart6, (uint8_t*)uart_receive_buf, USART_RX_BUFFER_SIZE);
     __HAL_UART_ENABLE_IT(&huart6, UART_IT_IDLE);
     //
     UART6_TX_Send((uint8_t *)"power-pico\r\n", 13);
-    // HAL_UART_Transmit_DMA(&huart6,(uint8_t *)"power-pico\r\n",13);
 
     // queue for voltage and current
     global_voltage_queue = queue_create(32);
@@ -87,7 +86,7 @@ void HardwareInitTask(void *argument)
     sys_settings.backlight_level = 80;
     sys_settings.key_sound_enable = 0;
     sys_settings.language_select = 0;
-    sys_settings.rotation = 270;
+    sys_settings.rotation = 180;
 
     // FUSB CC pin dis connect
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_10, GPIO_PIN_RESET);

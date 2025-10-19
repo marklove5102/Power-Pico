@@ -13,6 +13,7 @@
 #include "user_HardwareInitTask.h"
 #include "user_PDUFPTask.h"
 #include "user_KeyTask.h"
+#include "user_MessageTask.h"
 
 /* Private typedef -----------------------------------------------------------*/
 
@@ -52,6 +53,14 @@ const osThreadAttr_t KeyTask_attributes = {
   .priority = (osPriority_t) osPriorityNormal,
 };
 
+// message task
+osThreadId_t MessageTaskHandle;
+const osThreadAttr_t MessageTask_attributes = {
+  .name = "MessageTask",
+  .stack_size = 128 * 1,
+  .priority = (osPriority_t) osPriorityHigh,
+};
+
 //LVGL Handler task
 osThreadId_t LvHandlerTaskHandle;
 const osThreadAttr_t LvHandlerTask_attributes = {
@@ -88,6 +97,7 @@ void User_Tasks_Init(void)
   HardwareInitTaskHandle  = osThreadNew(HardwareInitTask, NULL, &HardwareInitTask_attributes);
   // PDUFPTaskHandle          = osThreadNew(PDUFPTask, NULL, &PDUFPTask_attributes);
   KeyTaskHandle 			    = osThreadNew(KeyTask, NULL, &KeyTask_attributes);
+  MessageTaskHandle       = osThreadNew(MessageTask, NULL, &MessageTask_attributes);
   LvHandlerTaskHandle     = osThreadNew(LvHandlerTask, NULL, &LvHandlerTask_attributes);
 
   /* add events, ... */
