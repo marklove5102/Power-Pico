@@ -84,7 +84,7 @@ void HardwareInitTask(void *argument)
 
     // system settings from eeprom
     if(!EEPROM_Init_Check()) {
-      Sys_Setting_Get();
+      EEPROM_SysSetting_Get();
     }
 
     // FUSB CC pin dis connect
