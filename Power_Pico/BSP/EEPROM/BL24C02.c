@@ -2,10 +2,10 @@
 #include "i2c.h"
 
 SysSettings_T sys_settings = {
-	.backlight_level = 80,
+	.backlight_level = 50,
 	.key_sound_enable = 1,
 	.language_select = 0,
-	.rotation = 180
+	.rotation = 0
 };
 
 static void BL24C02_Write(uint8_t addr, uint16_t length, uint8_t buff[])
@@ -25,15 +25,18 @@ static void delay_ms(uint32_t ms)
 
 /******************************************
 EEPROM Data description:
-[0x00]:0x55 for check
-[0x01]:0xAA for check
+[0x00]: 0x55 for check
+[0x01]: 0xAA for check
 
-[0x10]:user wrist setting, HWInterface.IMU.wrist_is_enabled
-[0x11]:user ui_APPSy_EN setting
+[0x10]: user backlight_level setting
+[0x11]: user key_sound_enable setting
+[0x12]: user language_select setting
+[0x13-14]: user rotation setting
 
+[0x20-]: update command storage area, "update\r\n"
 *******************************************/
 
-// to check the Data is right and the EEPROM is working
+// to check the Data is right and the EEPROM is working, 0-ok, 1-erro
 uint8_t EEPROM_Init_Check(void)
 {
 	uint8_t check_buff[2];
@@ -60,7 +63,7 @@ uint8_t EEPROM_Init_Check(void)
 
 
 // to Save the settings
-void Sys_Setting_Save(void)
+void EEPROM_SysSetting_Save(void)
 {
 	uint8_t buff[5];
 	buff[0] = sys_settings.backlight_level;
@@ -73,7 +76,7 @@ void Sys_Setting_Save(void)
 
 
 // to Get the settings
-void Sys_Setting_Get(void)
+void EEPROM_SysSetting_Get(void)
 {
 	uint8_t buff[5];
 	BL24C02_Read(0x10,5,buff);
@@ -95,4 +98,28 @@ void Sys_Setting_Get(void)
 		sys_settings.rotation = rotation;
 	else
 		sys_settings.rotation = 180;
+}
+
+// to write the update command
+void EEPROM_UpdateCommand_Write(bool is_update)
+{
+	if(is_update) {
+		char cmd[] = "update\r\n";
+		BL24C02_Write(0x20, strlen(cmd), (uint8_t *)cmd);
+	} else {
+		char cmd[] = "-nope-\r\n";
+		BL24C02_Write(0x20, strlen(cmd), (uint8_t *)cmd);
+	}
+}
+
+// to check the update command
+bool EEPROM_UpdateCommand_Check(void)
+{
+	char cmd[10] = {0};
+	BL24C02_Read(0x20, 8, (uint8_t *)cmd);
+	if(strcmp(cmd, "update\r\n") == 0) {
+		return true;
+	} else {
+		return false;
+	}
 }

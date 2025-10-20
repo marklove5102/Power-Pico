@@ -2,6 +2,8 @@
 #define __BL24C02_H
 
 #include <stdint.h>
+#include <stdbool.h>
+#include <string.h>
 
 #define BL24C02_ADDRESS	0x50
 
@@ -15,7 +17,9 @@ typedef struct {
 extern SysSettings_T sys_settings;
 
 uint8_t EEPROM_Init_Check(void);
-void Sys_Setting_Save(void);
-void Sys_Setting_Get(void);
+void EEPROM_SysSetting_Save(void);
+void EEPROM_SysSetting_Get(void);
+void EEPROM_UpdateCommand_Write(bool is_update);
+bool EEPROM_UpdateCommand_Check(void);
 
 #endif
