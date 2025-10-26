@@ -73,10 +73,10 @@ typedef struct
 }App_PD_t;
 
 extern FUSB302_dev_t fusb302_dev;
-extern PD_protocol_t pd_protocol;
+extern App_PD_t app_pd;
 
 uint8_t fusb302_dev_init(void);
-uint8_t fusb302_test(void);
+void handle_FUSB302_event(FUSB302_event_t events);
 
 #ifdef __cplusplus
 }

@@ -15,12 +15,11 @@
 
 
 #define PD_POLLING              100
-#define TYPEC_SINK_WAIT_CAP     1500
+#define TYPEC_SINK_WAIT_CAP     350
 #define REQUEST_TO_PS_READY     580
 #define PPS_REQUEST             5000
 
 FUSB302_dev_t fusb302_dev;
-PD_protocol_t pd_protocol;
 App_PD_t app_pd;
 
 void fusb302_i2c_read(uint8_t dev_addr, uint8_t reg_addr, uint8_t *data, uint8_t count)
@@ -184,13 +183,8 @@ uint8_t fusb302_dev_init(void) {
         fusb302_dev.delay_ms = HAL_Delay;
     #endif
     if (FUSB302_init(&fusb302_dev) == FUSB302_SUCCESS && FUSB302_get_ID(&fusb302_dev, 0, 0) == FUSB302_SUCCESS) {
-        PD_protocol_init(&pd_protocol);
+        PD_protocol_init(&app_pd.protocol);
         return 0;
     }
     return 1;
-}
-
-uint8_t fusb302_run(void) {
-
-    return 0;
 }

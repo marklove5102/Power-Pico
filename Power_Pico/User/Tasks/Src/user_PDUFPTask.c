@@ -22,8 +22,8 @@ void PDUFPTask(void *argument)
   // FUSB init
   fusb302_dev_init();
   // set
-  PD_protocol_set_power_option(&pd_protocol, PD_POWER_OPTION_MAX_VOLTAGE);
-  PD_protocol_set_PPS(&pd_protocol, PD_V(8.4), PD_A(2.0), false);
+  PD_protocol_set_power_option(&app_pd.protocol, PD_POWER_OPTION_MAX_9V);
+  PD_protocol_set_PPS(&app_pd.protocol, PPS_V(6.0), PPS_A(2.0), false);
 	while(1)
 	{
     if (fusb302_timer() || HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_4) == GPIO_PIN_RESET) {
@@ -33,7 +33,6 @@ void PDUFPTask(void *argument)
             handle_FUSB302_event(FUSB302_events);
         }
     }
-
-		osDelay(50);
+		osDelay(1);
 	}
 }
