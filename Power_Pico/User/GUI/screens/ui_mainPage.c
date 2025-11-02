@@ -8,6 +8,7 @@
 #include "data_queue.h"
 #include "math.h"
 #include "BL24C02.h" // system settings
+#include "rtc.h"    // elapsed time
 
 lv_obj_t * ui_HomeScreen = NULL;
 static lv_obj_t * ui_ButVal = NULL;
@@ -48,69 +49,72 @@ void ui_main_page_key_handler(uint8_t key_id)
     }
 }
 
+static void fmt_sig4(char *buf, size_t size, float v)
+{
+    if (!isfinite(v)) { snprintf(buf, size, "--"); return; }
+    if (fabsf(v) < 1e-9f) v = 0.0f; // 处理接近零的值
+    float av = fabsf(v);
+    int int_digits = (av >= 1.0f) ? ((int)floorf(log10f(av)) + 1) : 0;
+    if(int_digits >= 4) {
+        snprintf(buf, size, "%.0f", roundf(v));
+        return;
+    }
+    int decimals = (int_digits == 0) ? 3 : (4 - int_digits); // 确保总数字为 4
+    snprintf(buf, size, "%.*f", decimals, v);
+}
+
 static void set_val_cur_label(float voltage, float current)
 {
     char buf[16];
-    // voltage
-    sprintf(buf, "%.2f", voltage);
+
+    // voltage (单位: V) -> 4 位有效数字
+    fmt_sig4(buf, sizeof(buf), voltage);
     lv_label_set_text(ui_LabelValt, buf);
-    // current
-    if (fabs(current) >= 1000000.0) {
-        current = current / 1000000.0;
-        sprintf(buf, "%.2f", current); // 保留 2 位小数
+
+    // current (原始单位: uA)
+    float cur_uA = current;
+    float cur_abs_uA = fabsf(cur_uA);
+    float cur_disp = 0.0f;
+
+    if (cur_abs_uA >= 1e6f) {
+        cur_disp = cur_uA / 1e6f;      // A
+        fmt_sig4(buf, sizeof(buf), cur_disp);
         lv_label_set_text(ui_LabelCur, buf);
         lv_label_set_text(ui_LabelUnitCur, "A");
-    } else if(fabs(current) >= 1000.0) {
-        current = current / 1000.0;
-        if(fabs(current) >= 100.0) {
-            sprintf(buf, "%.1f", current);
-        }
-        else {
-            sprintf(buf, "%.2f", current);
-        }
+    } else if (cur_abs_uA >= 1e3f) {
+        cur_disp = cur_uA / 1e3f;      // mA
+        fmt_sig4(buf, sizeof(buf), cur_disp);
         lv_label_set_text(ui_LabelCur, buf);
         lv_label_set_text(ui_LabelUnitCur, "mA");
     } else {
-        if(fabs(current) >= 100.0) {
-            sprintf(buf, "%.1f", current);
-        }
-        else {
-            sprintf(buf, "%.2f", current);
-        }
+        cur_disp = cur_uA;             // uA
+        fmt_sig4(buf, sizeof(buf), cur_disp);
         lv_label_set_text(ui_LabelCur, buf);
         lv_label_set_text(ui_LabelUnitCur, "uA");
     }
-    // set power
-    float power = voltage * current; // in uW
-    if(fabs(power) >= 1000000.0) {
-        power = power / 1000000.0;
-        sprintf(buf, "%.2f", power);
+
+    // power = V * A，按 W/mW/uW 选择单位，4 位有效数字
+    float power_W = voltage * (cur_uA / 1e6f);
+    float p_abs = fabsf(power_W);
+
+    if (p_abs >= 1.0f) {
+        fmt_sig4(buf, sizeof(buf), power_W);       // W
         lv_label_set_text(ui_LabelEnerge, buf);
         lv_label_set_text(ui_LabelUnitEnerge, "W");
-    } else if(fabs(power) >= 1000.0) {
-        power = power / 1000.0;
-        if(fabs(power) >= 100.0) {
-            sprintf(buf, "%.1f", power);
-        }
-        else {
-            sprintf(buf, "%.2f", power);
-        }
+    } else if (p_abs >= 1e-3f) {
+        fmt_sig4(buf, sizeof(buf), power_W * 1e3f); // mW
         lv_label_set_text(ui_LabelEnerge, buf);
         lv_label_set_text(ui_LabelUnitEnerge, "mW");
     } else {
-        if(fabs(power) >= 100.0) {
-            sprintf(buf, "%.1f", power);
-        }
-        else {
-            sprintf(buf, "%.2f", power);
-        }
+        fmt_sig4(buf, sizeof(buf), power_W * 1e6f); // uW
         lv_label_set_text(ui_LabelEnerge, buf);
         lv_label_set_text(ui_LabelUnitEnerge, "uW");
     }
-    // set time
+
+    // time
     uint8_t hours = 0, minutes = 0, seconds = 0;
     GetElapsedTime_HMS(&hours, &minutes, &seconds);
-    sprintf(buf, "%02d:%02d:%02d", hours, minutes, seconds);
+    snprintf(buf, sizeof(buf), "%02d:%02d:%02d", hours, minutes, seconds);
     lv_label_set_text(ui_LabelTime, buf);
 }
 
