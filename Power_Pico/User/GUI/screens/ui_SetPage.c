@@ -57,19 +57,23 @@ void ui_set_page_key_handler(uint8_t key_id)
                     slider_value += 10;
                     if(slider_value > 100) slider_value = 100;
                     lv_slider_set_value(ui_SliderBL, slider_value, LV_ANIM_ON);
+                    Sys_Set_BacklightLevel(slider_value);
                 } else if (key_id == KEYN_NUM) {
                     int16_t slider_value = lv_slider_get_value(ui_SliderBL);
                     slider_value -= 10;
-                    if(slider_value < 0) slider_value = 10;
+                    if(slider_value < 10) slider_value = 10;
                     lv_slider_set_value(ui_SliderBL, slider_value, LV_ANIM_ON);
+                    Sys_Set_BacklightLevel(slider_value);
                 }
                 break;
             // key sound
             case 1:
                 if (key_id == KEYY_NUM) {
                     lv_obj_add_state(ui_SwitchKS, LV_STATE_CHECKED);
+                    Sys_Set_KeySoundEnable(1);
                 } else if(key_id == KEYN_NUM) {
                     lv_obj_clear_state(ui_SwitchKS, LV_STATE_CHECKED);
+                    Sys_Set_KeySoundEnable(0);
                 }
                 break;
 
@@ -80,26 +84,23 @@ void ui_set_page_key_handler(uint8_t key_id)
 
             // chose rotation
             case 3:
+                uint16_t rotation = Sys_Get_Rotation();
                 if (key_id == KEYY_NUM) {
-                    sys_settings.rotation = (sys_settings.rotation + 360 + 90) % 360;
-                    lv_display_rotation_t rotation = sys_settings.rotation / 90;
-                    lv_display_set_rotation(lv_display_get_default(), rotation);
-                    ui_full_screen_refresh(ui_SetPage);
+                    rotation = (rotation + 360 + 90) % 360;
                 } else if(key_id == KEYN_NUM) {
-                    sys_settings.rotation = (sys_settings.rotation + 360 - 90) % 360;
-                    lv_display_rotation_t rotation = sys_settings.rotation / 90;
-                    lv_display_set_rotation(lv_display_get_default(), rotation);
-                    ui_full_screen_refresh(ui_SetPage);
+                    rotation = (rotation + 360 - 90) % 360;
                 }
-                if (sys_settings.rotation == 0) {
+                if (rotation == 0) {
                     lv_label_set_text(ui_LabelRotNum, "<  0  >");
-                } else if (sys_settings.rotation == 90) {
+                } else if (rotation == 90) {
                     lv_label_set_text(ui_LabelRotNum, "< 90 >");
-                } else if (sys_settings.rotation == 180) {
+                } else if (rotation == 180) {
                     lv_label_set_text(ui_LabelRotNum, "< 180 >");
-                } else if (sys_settings.rotation == 270) {
+                } else if (rotation == 270) {
                     lv_label_set_text(ui_LabelRotNum, "< 270 >");
                 }
+                Sys_Set_Rotation(rotation);
+                ui_full_screen_refresh(ui_SetPage);
                 break;
 
             // about
@@ -108,6 +109,32 @@ void ui_set_page_key_handler(uint8_t key_id)
                 break;
 
         }
+        // save settings to eeprom
+        EEPROM_SysSetting_Save();
+    }
+}
+
+static void _setting_init(void) {
+
+    // backlight
+    lv_slider_set_value(ui_SliderBL, Sys_Get_BacklightLevel(), LV_ANIM_OFF);
+
+    // key sound
+    if(Sys_Get_KeySoundEnable())
+        lv_obj_add_state(ui_SwitchKS, LV_STATE_CHECKED);
+    else
+        lv_obj_clear_state(ui_SwitchKS, LV_STATE_CHECKED);
+
+    // lcd rotation
+    uint16_t rotation = Sys_Get_Rotation();
+    if (rotation == 0) {
+        lv_label_set_text(ui_LabelRotNum, "<  0  >");
+    } else if (rotation == 90) {
+        lv_label_set_text(ui_LabelRotNum, "< 90 >");
+    } else if (rotation == 180) {
+        lv_label_set_text(ui_LabelRotNum, "< 180 >");
+    } else if (rotation == 270) {
+        lv_label_set_text(ui_LabelRotNum, "< 270 >");
     }
 }
 
@@ -234,6 +261,9 @@ void ui_SetPage_screen_init(void)
     lv_obj_set_height(ui_LabelAbout, LV_SIZE_CONTENT);    /// 1
     lv_label_set_text(ui_LabelAbout, "About\nPower-Pico\nA uA current meter\nV 1.0.0");
     lv_obj_set_style_text_font(ui_LabelAbout, &lv_font_montserrat_16, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    // init setting values
+    _setting_init();
 
     // store panels in array
     panels[0] = ui_PanelBL;

@@ -7,19 +7,24 @@
 
 #define BL24C02_ADDRESS	0x50
 
-typedef struct {
-	uint8_t  backlight_level;   // 0-100
-	uint8_t  key_sound_enable;  // 0:disable, 1:enable
-	uint8_t  language_select;   // 0:English, 1:Chinese
-	uint16_t  rotation;		    // 0, 90, 180, 270
-} SysSettings_T;
-
-extern SysSettings_T sys_settings;
-
 uint8_t EEPROM_Init_Check(void);
 void EEPROM_SysSetting_Save(void);
 void EEPROM_SysSetting_Get(void);
 void EEPROM_UpdateCommand_Write(bool is_update);
 bool EEPROM_UpdateCommand_Check(void);
+
+// set functions
+
+void Sys_Set_BacklightLevel(uint8_t level);
+void Sys_Set_KeySoundEnable(bool enable);
+void Sys_Set_LanguageSelect(uint8_t lang);
+void Sys_Set_Rotation(uint16_t rotation);
+
+// get functions
+
+uint8_t Sys_Get_BacklightLevel(void);
+uint8_t Sys_Get_KeySoundEnable(void);
+uint8_t Sys_Get_LanguageSelect(void);
+uint16_t Sys_Get_Rotation(void);
 
 #endif

@@ -4,6 +4,7 @@
 #include "main.h"
 #include "key.h"
 #include "beep.h"
+#include "BL24C02.h" // settings
 
 /* Private typedef -----------------------------------------------------------*/
 
@@ -29,7 +30,7 @@ void KeyTask(void *argument)
 		{
 			osMessageQueuePut(Key_MessageQueue, &keystr, 0, 1);
 			// beep
-			if(1)
+			if(Sys_Get_KeySoundEnable())
 			{
 				beep_open();
 				osDelay(50);

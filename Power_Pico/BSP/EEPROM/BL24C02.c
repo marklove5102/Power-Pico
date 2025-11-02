@@ -1,7 +1,16 @@
 #include "BL24C02.h"
 #include "i2c.h"
+// hardware settings
+#include "lcd_init.h"
 
-SysSettings_T sys_settings = {
+typedef struct {
+	uint8_t  backlight_level;   // 0-100
+	uint8_t  key_sound_enable;  // 0:disable, 1:enable
+	uint8_t  language_select;   // 0:English, 1:Chinese
+	uint16_t  rotation;		    // 0, 90, 180, 270
+} SysSettings_T;
+
+static SysSettings_T sys_settings = {
 	.backlight_level = 50,
 	.key_sound_enable = 1,
 	.language_select = 0,
@@ -122,4 +131,60 @@ bool EEPROM_UpdateCommand_Check(void)
 	} else {
 		return false;
 	}
+}
+
+// Set functions
+
+void Sys_Set_BacklightLevel(uint8_t level)
+{
+	if(level <= 100 && level >= 10) {
+		sys_settings.backlight_level = level;
+		LCD_Set_Light(level);
+	}
+}
+
+void Sys_Set_KeySoundEnable(bool enable)
+{
+	if(enable) {
+		sys_settings.key_sound_enable = 1;
+	} else {
+		sys_settings.key_sound_enable = 0;
+	}
+}
+
+void Sys_Set_LanguageSelect(uint8_t lang)
+{
+	if(lang <= 1) {
+		sys_settings.language_select = lang;
+	}
+}
+
+void Sys_Set_Rotation(uint16_t rotation)
+{
+	if(rotation == 0 || rotation == 90 || rotation == 180 || rotation == 270) {
+		sys_settings.rotation = rotation;
+		LCD_SetRotation(rotation);
+	}
+}
+
+// Get functions
+
+uint8_t Sys_Get_BacklightLevel(void)
+{
+	return sys_settings.backlight_level;
+}
+
+uint8_t Sys_Get_KeySoundEnable(void)
+{
+	return sys_settings.key_sound_enable;
+}
+
+uint8_t Sys_Get_LanguageSelect(void)
+{
+	return sys_settings.language_select;
+}
+
+uint16_t Sys_Get_Rotation(void)
+{
+	return sys_settings.rotation;
 }

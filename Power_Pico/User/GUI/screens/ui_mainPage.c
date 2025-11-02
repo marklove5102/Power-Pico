@@ -36,15 +36,21 @@ void ui_main_page_key_handler(uint8_t key_id)
     } else if (key_id == KEYL_NUM) {
         // rotation - 90 degrees
         // rotation – LV_DISPLAY_ROTATION_0/90/180/270
-        sys_settings.rotation = (sys_settings.rotation + 360 - 90) % 360;
-        lv_display_rotation_t rotation = sys_settings.rotation / 90;
-        lv_display_set_rotation(lv_display_get_default(), rotation);
+        uint16_t rotation = Sys_Get_Rotation();
+        rotation = (rotation + 360 - 90) % 360;
+        // set rotation value
+        Sys_Set_Rotation(rotation);
+        // save settings to eeprom
+        EEPROM_SysSetting_Save();
         ui_full_screen_refresh(ui_HomeScreen);
     } else if (key_id == KEYR_NUM) {
         // rotation + 90 degrees
-        sys_settings.rotation = (sys_settings.rotation + 360 + 90) % 360;
-        lv_display_rotation_t rotation = sys_settings.rotation / 90;
-        lv_display_set_rotation(lv_display_get_default(), rotation);
+        uint16_t rotation = Sys_Get_Rotation();
+        rotation = (rotation + 360 + 90) % 360;
+        // set rotation value
+        Sys_Set_Rotation(rotation);
+        // save settings to eeprom
+        EEPROM_SysSetting_Save();
         ui_full_screen_refresh(ui_HomeScreen);
     }
 }
