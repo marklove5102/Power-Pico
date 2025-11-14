@@ -6,23 +6,41 @@
 #include "../ui.h"
 
 lv_obj_t * ui_ChartPage = NULL;
-static lv_obj_t * ui_DataChart = NULL;
-static lv_obj_t * ui_DataChart_Xaxis = NULL;
-static lv_obj_t * ui_DataChart_Yaxis1 = NULL;
-static lv_obj_t * ui_DataChart_Yaxis2 = NULL;
+static lv_obj_t * ui_ContainChart = NULL;
+static lv_obj_t * row_line1 = NULL;
+static lv_obj_t * row_line2 = NULL;
+static lv_obj_t * row_line3 = NULL;
+static lv_obj_t * row_line4 = NULL;
+static lv_obj_t * col_line1 = NULL;
+static lv_obj_t * col_line2 = NULL;
+static lv_obj_t * col_line3 = NULL;
+static lv_obj_t * col_line4 = NULL;
+static lv_obj_t * ui_AxisV5 = NULL;
+static lv_obj_t * ui_AxisV4 = NULL;
+static lv_obj_t * ui_AxisV3 = NULL;
+static lv_obj_t * ui_AxisV2 = NULL;
+static lv_obj_t * ui_AxisV1 = NULL;
+static lv_obj_t * ui_AxisV = NULL;
+static lv_obj_t * ui_AxisC = NULL;
+static lv_obj_t * ui_AxisC1 = NULL;
+static lv_obj_t * ui_AxisC2 = NULL;
+static lv_obj_t * ui_AxisC3 = NULL;
+static lv_obj_t * ui_AxisC4 = NULL;
+static lv_obj_t * ui_AxisC5 = NULL;
 static lv_obj_t * ui_PanelVol = NULL;
-static lv_obj_t * ui_PanelCur = NULL;
 static lv_obj_t * ui_LabelVol = NULL;
 static lv_obj_t * ui_LabelVolUnit = NULL;
-static lv_obj_t * ui_LabelCur = NULL;
+static lv_obj_t * ui_PanelCur = NULL;
+static lv_obj_t * ui_LabelCur1 = NULL;
 static lv_obj_t * ui_LabelCurUnit = NULL;
-static lv_obj_t * ui_StateBtn = NULL;
-static lv_obj_t * ui_StateLabel = NULL;
-static lv_obj_t * ui_TickVolUnit = NULL;
-static lv_obj_t * ui_TickCurUnit = NULL;
+static lv_obj_t * ui_ButState = NULL;
+static lv_obj_t * ui_LabelState = NULL;
 
 static lv_timer_t * chart_update_timer = NULL; // 定时器
 static bool is_chart_running = true;
+
+static lv_point_precise_t line_points[4][2] = {{{-170, 36}, {170, 36}}, {{-170, 72},{170, 72}}, {{-170,108},{170,108}}, {{-170, 144},{170, 144}}};
+static lv_point_precise_t col_points[4][2] = {{{34, -180}, {34, 180}}, {{68, -180},{68, 180}}, {{102, -180},{102, 180}}, {{136, -180},{136, 180}}};
 
 #define POINTS_NUM 32
 // 模拟数据数组
@@ -33,82 +51,9 @@ static uint8_t data_index = 0;
 
 // event funtions
 
-// 清空图表数据
-static void clear_chart_data(void) {
-    for (int i = 0; i < POINTS_NUM; i++) {
-        ui_DataChart_vol_array[i] = 0;
-        ui_DataChart_cur_array[i] = 0;
-    }
-    lv_chart_refresh(ui_DataChart);
-}
-
-
-// btn event
-static void _ui_Chart_Btn_cb(lv_event_t * e) {
-    // check btn state
-    lv_event_code_t code = lv_event_get_code(e);
-    LV_LOG_WARN("Chart btn event code: %d", code);
-    is_chart_running = !is_chart_running;
-
-    if(is_chart_running) {
-        lv_label_set_text(ui_StateLabel, LV_SYMBOL_PLAY);
-        clear_chart_data();
-    }
-    else {
-        lv_label_set_text(ui_StateLabel, LV_SYMBOL_PAUSE);
-    }
-
-}
-
 // 定时器回调函数：更新图表数据
 static void _chart_update_cb(lv_timer_t * timer) {
-    if (!is_chart_running) return;
-    // 获取图表对象
-    lv_obj_t * chart = lv_timer_get_user_data(timer);
 
-    // 获取数据系列
-    lv_chart_series_t * vol_series = lv_chart_get_series_next(chart, NULL);
-    lv_chart_series_t * cur_series = lv_chart_get_series_next(chart, vol_series);
-
-    // 添加新数据
-    lv_chart_set_next_value(chart, vol_series, 3);  // 模拟电压数据
-    lv_chart_set_next_value(chart, cur_series, 3);  // 模拟电流数据
-
-    // 模拟数据间隙
-    uint16_t point_count = lv_chart_get_point_count(chart);
-    uint16_t start_index = lv_chart_get_x_start_point(chart, vol_series);
-    lv_coord_t * vol_array = lv_chart_get_y_array(chart, vol_series);
-    lv_coord_t * cur_array = lv_chart_get_y_array(chart, cur_series);
-
-    vol_array[(start_index + 1) % point_count] = LV_CHART_POINT_NONE;
-    cur_array[(start_index + 1) % point_count] = LV_CHART_POINT_NONE;
-
-    // 动态调整坐标轴范围
-    lv_coord_t max_vol = 0;
-    lv_coord_t max_cur = 0;
-
-    for (uint16_t i = 0; i < point_count; i++) {
-        if (vol_array[i] != LV_CHART_POINT_NONE && vol_array[i] > max_vol) {
-            max_vol = vol_array[i];
-        }
-        if (cur_array[i] != LV_CHART_POINT_NONE && cur_array[i] > max_cur) {
-            max_cur = cur_array[i];
-        }
-    }
-
-    // 动态调整图表范围，增加一定的缓冲区（+1）
-    lv_coord_t new_vol_range = max_vol * 1.5;
-    lv_coord_t new_cur_range = max_cur * 1.5;
-
-    lv_chart_set_range(chart, LV_CHART_AXIS_PRIMARY_Y, 0, new_vol_range);  // 电压轴
-    lv_chart_set_range(chart, LV_CHART_AXIS_SECONDARY_Y, 0, new_cur_range);  // 电流轴
-
-    // 动态调整坐标轴范围
-    lv_scale_set_range(ui_DataChart_Yaxis1, 0, new_vol_range);  // 更新左侧电压坐标轴
-    lv_scale_set_range(ui_DataChart_Yaxis2, 0, new_cur_range);  // 更新右侧电流坐标轴
-
-    // 刷新图表
-    lv_chart_refresh(chart);
 
 }
 
@@ -127,73 +72,196 @@ void ui_ChartPage_screen_init(void)
     ui_ChartPage = lv_obj_create(NULL);
     lv_obj_remove_flag(ui_ChartPage, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
-    ui_DataChart = lv_chart_create(ui_ChartPage);
-    lv_obj_set_width(ui_DataChart, 180);
-    lv_obj_set_height(ui_DataChart, 180);
-    lv_obj_set_x(ui_DataChart, 0);
-    lv_obj_set_y(ui_DataChart, 10);
-    lv_obj_set_align(ui_DataChart, LV_ALIGN_TOP_MID);
-    lv_obj_add_flag(ui_DataChart, LV_OBJ_FLAG_OVERFLOW_VISIBLE);     /// Flags
-    lv_obj_remove_flag(ui_DataChart, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-    lv_obj_add_flag(ui_DataChart, LV_OBJ_FLAG_OVERFLOW_VISIBLE);      //make scales visible - Should it be forced to True?
-    //lv_obj_remove_flag( ui_DataChart, LV_OBJ_FLAG_SCROLLABLE );    //no chart-zoom in LVGL9 - Shouldn't it be forced to False?
-    lv_chart_set_type(ui_DataChart, LV_CHART_TYPE_LINE);
-    lv_chart_set_point_count(ui_DataChart, POINTS_NUM);
-    lv_chart_set_range(ui_DataChart, LV_CHART_AXIS_PRIMARY_Y, 0, 5);
-    lv_obj_set_style_radius(ui_DataChart, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_line_color(ui_DataChart, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_line_opa(ui_DataChart, 128, LV_PART_MAIN | LV_STATE_DEFAULT);
+    ui_ContainChart = lv_obj_create(ui_ChartPage);
+    lv_obj_remove_style_all(ui_ContainChart);
+    lv_obj_set_width(ui_ContainChart, 170);
+    lv_obj_set_height(ui_ContainChart, 180);
+    lv_obj_set_x(ui_ContainChart, 0);
+    lv_obj_set_y(ui_ContainChart, -15);
+    lv_obj_set_align(ui_ContainChart, LV_ALIGN_CENTER);
+    lv_obj_remove_flag(ui_ContainChart, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_bg_color(ui_ContainChart, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_ContainChart, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_color(ui_ContainChart, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_opa(ui_ContainChart, 64, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_width(ui_ContainChart, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_DataChart_Xaxis = lv_scale_create(ui_DataChart);
-    lv_scale_set_mode(ui_DataChart_Xaxis, LV_SCALE_MODE_HORIZONTAL_BOTTOM);
-    lv_obj_set_size(ui_DataChart_Xaxis, lv_pct(100), 50);
-    lv_obj_set_align(ui_DataChart_Xaxis, LV_ALIGN_BOTTOM_MID);
-    lv_obj_set_y(ui_DataChart_Xaxis, 50 + lv_obj_get_style_pad_bottom(ui_DataChart,
-                                                                   LV_PART_MAIN) + lv_obj_get_style_border_width(ui_DataChart, LV_PART_MAIN));
-    lv_obj_set_style_line_width(ui_DataChart_Xaxis, 0, LV_PART_MAIN);
-    lv_obj_set_style_line_width(ui_DataChart_Xaxis, 1, LV_PART_ITEMS);   //LVGL-9.1 ticks are thicker by default
-    lv_obj_set_style_line_width(ui_DataChart_Xaxis, 1, LV_PART_INDICATOR);
-    lv_obj_set_style_length(ui_DataChart_Xaxis, 0, LV_PART_ITEMS);      //minor tick length
-    lv_obj_set_style_length(ui_DataChart_Xaxis, 5, LV_PART_INDICATOR);      //major tick length
-    lv_scale_set_range(ui_DataChart_Xaxis, 0, 5 > 0 ? 5 - 1 : 0);
-    lv_scale_set_total_tick_count(ui_DataChart_Xaxis, (5 > 0 ? 5 - 1 : 0) * 10 + 1);
-    lv_scale_set_major_tick_every(ui_DataChart_Xaxis, 10 >= 1 ? 10 : 1);
-    lv_scale_set_label_show(ui_DataChart_Xaxis, false);
-    ui_DataChart_Yaxis1 = lv_scale_create(ui_DataChart);
-    lv_scale_set_mode(ui_DataChart_Yaxis1, LV_SCALE_MODE_VERTICAL_LEFT);
-    lv_obj_set_size(ui_DataChart_Yaxis1, 10, lv_pct(100));
-    lv_obj_set_align(ui_DataChart_Yaxis1, LV_ALIGN_LEFT_MID);
-    lv_obj_set_x(ui_DataChart_Yaxis1, -10 - lv_obj_get_style_pad_left(ui_DataChart,
-                                                                   LV_PART_MAIN) - lv_obj_get_style_border_width(ui_DataChart, LV_PART_MAIN) + 2);
-    lv_obj_set_style_line_width(ui_DataChart_Yaxis1, 0, LV_PART_MAIN);
-    lv_obj_set_style_line_width(ui_DataChart_Yaxis1, 1, LV_PART_ITEMS);
-    lv_obj_set_style_line_width(ui_DataChart_Yaxis1, 1, LV_PART_INDICATOR);
-    lv_obj_set_style_length(ui_DataChart_Yaxis1, 5, LV_PART_ITEMS);   //minor tick length
-    lv_obj_set_style_length(ui_DataChart_Yaxis1, 10, LV_PART_INDICATOR);   //major tick length
-    lv_scale_set_range(ui_DataChart_Yaxis1,  0, 5);
-    lv_scale_set_total_tick_count(ui_DataChart_Yaxis1, (5 > 0 ? 5 - 1 : 0) * 2 + 1);
-    lv_scale_set_major_tick_every(ui_DataChart_Yaxis1, 2 >= 1 ? 2 : 1);
-    ui_DataChart_Yaxis2 = lv_scale_create(ui_DataChart);
-    lv_scale_set_mode(ui_DataChart_Yaxis2, LV_SCALE_MODE_VERTICAL_RIGHT);
-    lv_obj_set_size(ui_DataChart_Yaxis2, 25, lv_pct(100));
-    lv_obj_set_align(ui_DataChart_Yaxis2, LV_ALIGN_RIGHT_MID);
-    lv_obj_set_x(ui_DataChart_Yaxis2, 25 + lv_obj_get_style_pad_right(ui_DataChart,
-                                                                   LV_PART_MAIN) + lv_obj_get_style_border_width(ui_DataChart, LV_PART_MAIN) + 1);
-    lv_obj_set_style_line_width(ui_DataChart_Yaxis2, 0, LV_PART_MAIN);
-    lv_obj_set_style_line_width(ui_DataChart_Yaxis2, 1, LV_PART_ITEMS);
-    lv_obj_set_style_line_width(ui_DataChart_Yaxis2, 1, LV_PART_INDICATOR);
-    lv_obj_set_style_length(ui_DataChart_Yaxis2, 5, LV_PART_ITEMS);   //minor tick length
-    lv_obj_set_style_length(ui_DataChart_Yaxis2, 10, LV_PART_INDICATOR);   //major tick length
-    lv_scale_set_total_tick_count(ui_DataChart_Yaxis2, (5 > 0 ? 5 - 1 : 0) * 2 + 1);
-    lv_scale_set_major_tick_every(ui_DataChart_Yaxis2, 2 >= 1 ? 2 : 1);
+    row_line1 = lv_line_create(ui_ContainChart);
+    lv_line_set_points(row_line1, line_points[0], 2);
+    lv_obj_set_style_line_color(row_line1, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_line_width(row_line1, 1, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_line_opa(row_line1, 64, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_align(row_line1, LV_ALIGN_TOP_MID);
 
-    lv_obj_set_style_bg_color(ui_DataChart, lv_color_hex(0xFFFFFF), LV_PART_INDICATOR | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui_DataChart, 0, LV_PART_INDICATOR | LV_STATE_DEFAULT);
+    row_line2 = lv_line_create(ui_ContainChart);
+    lv_line_set_points(row_line2, line_points[1], 2);
+    lv_obj_set_style_line_color(row_line2, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_line_width(row_line2, 1, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_line_opa(row_line2, 64, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_align(row_line2, LV_ALIGN_TOP_MID);
 
-    //This workaround (an invisible outline) is needed because without it chart overflow-visible doesn't work in LVGL-9.1
-    lv_obj_set_style_outline_pad(ui_DataChart, LV_MAX3(50, 10, 25),
-                                 LV_PART_MAIN | LV_STATE_DEFAULT);   //workaround for ineffective 'overflow visible' flag
-    lv_obj_set_style_outline_width(ui_DataChart, -1, LV_PART_MAIN | LV_STATE_DEFAULT);
+    row_line3 = lv_line_create(ui_ContainChart);
+    lv_line_set_points(row_line3, line_points[2], 2);
+    lv_obj_set_style_line_color(row_line3, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_line_width(row_line3, 1, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_line_opa(row_line3, 64, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_align(row_line3, LV_ALIGN_TOP_MID);
+
+    row_line4 = lv_line_create(ui_ContainChart);
+    lv_line_set_points(row_line4, line_points[3], 2);
+    lv_obj_set_style_line_color(row_line4, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_line_width(row_line4, 1, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_line_opa(row_line4, 64, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_align(row_line4, LV_ALIGN_TOP_MID);
+
+    col_line1 = lv_line_create(ui_ContainChart);
+    lv_line_set_points(col_line1, col_points[0], 2);
+    lv_obj_set_style_line_color(col_line1, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_line_width(col_line1, 1, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_line_opa(col_line1, 64, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_align(col_line1, LV_ALIGN_LEFT_MID);
+
+    col_line2 = lv_line_create(ui_ContainChart);
+    lv_line_set_points(col_line2, col_points[1], 2);
+    lv_obj_set_style_line_color(col_line2, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_line_width(col_line2, 1, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_line_opa(col_line2, 64, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_align(col_line2, LV_ALIGN_LEFT_MID);
+
+    col_line3 = lv_line_create(ui_ContainChart);
+    lv_line_set_points(col_line3, col_points[2], 2);
+    lv_obj_set_style_line_color(col_line3, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_line_width(col_line3, 1, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_line_opa(col_line3, 64, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_align(col_line3, LV_ALIGN_LEFT_MID);
+
+    col_line4 = lv_line_create(ui_ContainChart);
+    lv_line_set_points(col_line4, col_points[3], 2);
+    lv_obj_set_style_line_color(col_line4, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_line_width(col_line4, 1, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_line_opa(col_line4, 64, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_align(col_line4, LV_ALIGN_LEFT_MID);
+
+    ui_AxisV5 = lv_label_create(ui_ChartPage);
+    lv_obj_set_width(ui_AxisV5, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_AxisV5, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_AxisV5, 100);
+    lv_obj_set_y(ui_AxisV5, -104);
+    lv_obj_set_align(ui_AxisV5, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_AxisV5, "5.0");
+    lv_obj_set_style_text_color(ui_AxisV5, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_AxisV5, 200, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_AxisV4 = lv_label_create(ui_ChartPage);
+    lv_obj_set_width(ui_AxisV4, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_AxisV4, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_AxisV4, 100);
+    lv_obj_set_y(ui_AxisV4, -68);
+    lv_obj_set_align(ui_AxisV4, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_AxisV4, "4.0");
+    lv_obj_set_style_text_color(ui_AxisV4, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_AxisV4, 200, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_AxisV3 = lv_label_create(ui_ChartPage);
+    lv_obj_set_width(ui_AxisV3, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_AxisV3, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_AxisV3, 100);
+    lv_obj_set_y(ui_AxisV3, -32);
+    lv_obj_set_align(ui_AxisV3, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_AxisV3, "3.0");
+    lv_obj_set_style_text_color(ui_AxisV3, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_AxisV3, 200, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_AxisV2 = lv_label_create(ui_ChartPage);
+    lv_obj_set_width(ui_AxisV2, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_AxisV2, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_AxisV2, 100);
+    lv_obj_set_y(ui_AxisV2, 4);
+    lv_obj_set_align(ui_AxisV2, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_AxisV2, "2.0");
+    lv_obj_set_style_text_color(ui_AxisV2, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_AxisV2, 200, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_AxisV1 = lv_label_create(ui_ChartPage);
+    lv_obj_set_width(ui_AxisV1, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_AxisV1, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_AxisV1, 100);
+    lv_obj_set_y(ui_AxisV1, 39);
+    lv_obj_set_align(ui_AxisV1, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_AxisV1, "1.0");
+    lv_obj_set_style_text_color(ui_AxisV1, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_AxisV1, 200, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_AxisV = lv_label_create(ui_ChartPage);
+    lv_obj_set_width(ui_AxisV, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_AxisV, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_AxisV, 100);
+    lv_obj_set_y(ui_AxisV, 70);
+    lv_obj_set_align(ui_AxisV, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_AxisV, "V");
+    lv_obj_set_style_text_color(ui_AxisV, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_AxisV, 200, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_AxisC = lv_label_create(ui_ChartPage);
+    lv_obj_set_width(ui_AxisC, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_AxisC, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_AxisC, -100);
+    lv_obj_set_y(ui_AxisC, 70);
+    lv_obj_set_align(ui_AxisC, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_AxisC, "A");
+    lv_obj_set_style_text_color(ui_AxisC, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_AxisC, 200, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_AxisC1 = lv_label_create(ui_ChartPage);
+    lv_obj_set_width(ui_AxisC1, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_AxisC1, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_AxisC1, -100);
+    lv_obj_set_y(ui_AxisC1, 39);
+    lv_obj_set_align(ui_AxisC1, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_AxisC1, "0.4");
+    lv_obj_set_style_text_color(ui_AxisC1, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_AxisC1, 200, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_AxisC2 = lv_label_create(ui_ChartPage);
+    lv_obj_set_width(ui_AxisC2, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_AxisC2, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_AxisC2, -100);
+    lv_obj_set_y(ui_AxisC2, 4);
+    lv_obj_set_align(ui_AxisC2, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_AxisC2, "0.8");
+    lv_obj_set_style_text_color(ui_AxisC2, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_AxisC2, 200, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_AxisC3 = lv_label_create(ui_ChartPage);
+    lv_obj_set_width(ui_AxisC3, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_AxisC3, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_AxisC3, -100);
+    lv_obj_set_y(ui_AxisC3, -32);
+    lv_obj_set_align(ui_AxisC3, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_AxisC3, "1.2");
+    lv_obj_set_style_text_color(ui_AxisC3, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_AxisC3, 200, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_AxisC4 = lv_label_create(ui_ChartPage);
+    lv_obj_set_width(ui_AxisC4, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_AxisC4, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_AxisC4, -100);
+    lv_obj_set_y(ui_AxisC4, -68);
+    lv_obj_set_align(ui_AxisC4, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_AxisC4, "1.6");
+    lv_obj_set_style_text_color(ui_AxisC4, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_AxisC4, 200, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_AxisC5 = lv_label_create(ui_ChartPage);
+    lv_obj_set_width(ui_AxisC5, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_AxisC5, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_AxisC5, -100);
+    lv_obj_set_y(ui_AxisC5, -104);
+    lv_obj_set_align(ui_AxisC5, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_AxisC5, "2.0");
+    lv_obj_set_style_text_color(ui_AxisC5, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_AxisC5, 200, LV_PART_MAIN | LV_STATE_DEFAULT);
+
     ui_PanelVol = lv_obj_create(ui_ChartPage);
     lv_obj_set_width(ui_PanelVol, 80);
     lv_obj_set_height(ui_PanelVol, 35);
@@ -203,6 +271,24 @@ void ui_ChartPage_screen_init(void)
     lv_obj_remove_flag(ui_PanelVol, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
     lv_obj_set_style_bg_color(ui_PanelVol, lv_color_hex(0xE36666), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_PanelVol, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_LabelVol = lv_label_create(ui_PanelVol);
+    lv_obj_set_width(ui_LabelVol, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_LabelVol, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_LabelVol, -12);
+    lv_obj_set_y(ui_LabelVol, 0);
+    lv_obj_set_align(ui_LabelVol, LV_ALIGN_RIGHT_MID);
+    lv_label_set_text(ui_LabelVol, "5.42");
+    lv_obj_set_style_text_font(ui_LabelVol, &lv_font_montserrat_18, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_LabelVolUnit = lv_label_create(ui_PanelVol);
+    lv_obj_set_width(ui_LabelVolUnit, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_LabelVolUnit, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_LabelVolUnit, 5);
+    lv_obj_set_y(ui_LabelVolUnit, 0);
+    lv_obj_set_align(ui_LabelVolUnit, LV_ALIGN_RIGHT_MID);
+    lv_label_set_text(ui_LabelVolUnit, "V");
+    lv_obj_set_style_text_font(ui_LabelVolUnit, &lv_font_montserrat_18, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_PanelCur = lv_obj_create(ui_ChartPage);
     lv_obj_set_width(ui_PanelCur, 100);
@@ -214,96 +300,78 @@ void ui_ChartPage_screen_init(void)
     lv_obj_set_style_bg_color(ui_PanelCur, lv_color_hex(0x42AA49), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_PanelCur, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_LabelVol = lv_label_create(ui_ChartPage);
-    lv_obj_set_width(ui_LabelVol, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_LabelVol, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_LabelVol, -40);
-    lv_obj_set_y(ui_LabelVol, -12);
-    lv_obj_set_align(ui_LabelVol, LV_ALIGN_BOTTOM_MID);
-    lv_label_set_text(ui_LabelVol, "17.23");
-    lv_obj_set_style_text_font(ui_LabelVol, &lv_font_montserrat_18, LV_PART_MAIN | LV_STATE_DEFAULT);
+    ui_LabelCur1 = lv_label_create(ui_PanelCur);
+    lv_obj_set_width(ui_LabelCur1, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_LabelCur1, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_LabelCur1, -30);
+    lv_obj_set_y(ui_LabelCur1, 0);
+    lv_obj_set_align(ui_LabelCur1, LV_ALIGN_RIGHT_MID);
+    lv_label_set_text(ui_LabelCur1, "15.23");
+    lv_obj_set_style_text_font(ui_LabelCur1, &lv_font_montserrat_18, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_LabelVolUnit = lv_label_create(ui_ChartPage);
-    lv_obj_set_width(ui_LabelVolUnit, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_LabelVolUnit, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_LabelVolUnit, -10);
-    lv_obj_set_y(ui_LabelVolUnit, -12);
-    lv_obj_set_align(ui_LabelVolUnit, LV_ALIGN_BOTTOM_MID);
-    lv_label_set_text(ui_LabelVolUnit, "V");
-    lv_obj_set_style_text_font(ui_LabelVolUnit, &lv_font_montserrat_18, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-    ui_LabelCur = lv_label_create(ui_ChartPage);
-    lv_obj_set_width(ui_LabelCur, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_LabelCur, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_LabelCur, 45);
-    lv_obj_set_y(ui_LabelCur, -12);
-    lv_obj_set_align(ui_LabelCur, LV_ALIGN_BOTTOM_MID);
-    lv_label_set_text(ui_LabelCur, "17.23");
-    lv_obj_set_style_text_font(ui_LabelCur, &lv_font_montserrat_18, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-    ui_LabelCurUnit = lv_label_create(ui_ChartPage);
+    ui_LabelCurUnit = lv_label_create(ui_PanelCur);
     lv_obj_set_width(ui_LabelCurUnit, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_LabelCurUnit, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_LabelCurUnit, 85);
-    lv_obj_set_y(ui_LabelCurUnit, -12);
-    lv_obj_set_align(ui_LabelCurUnit, LV_ALIGN_BOTTOM_MID);
+    lv_obj_set_x(ui_LabelCurUnit, 5);
+    lv_obj_set_y(ui_LabelCurUnit, 0);
+    lv_obj_set_align(ui_LabelCurUnit, LV_ALIGN_RIGHT_MID);
     lv_label_set_text(ui_LabelCurUnit, "mA");
     lv_obj_set_style_text_font(ui_LabelCurUnit, &lv_font_montserrat_18, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_StateBtn = lv_button_create(ui_ChartPage);
-    lv_obj_set_width(ui_StateBtn, 35);
-    lv_obj_set_height(ui_StateBtn, 35);
-    lv_obj_set_x(ui_StateBtn, -90);
-    lv_obj_set_y(ui_StateBtn, -5);
-    lv_obj_set_align(ui_StateBtn, LV_ALIGN_BOTTOM_MID);
-    lv_obj_add_flag(ui_StateBtn, LV_OBJ_FLAG_CHECKABLE | LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
-    lv_obj_remove_flag(ui_StateBtn, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-    lv_obj_set_style_bg_color(ui_StateBtn, lv_color_hex(0xF03737), LV_PART_MAIN | LV_STATE_CHECKED);
-    lv_obj_set_style_bg_opa(ui_StateBtn, 255, LV_PART_MAIN | LV_STATE_CHECKED);
+    ui_ButState = lv_button_create(ui_ChartPage);
+    lv_obj_set_width(ui_ButState, 35);
+    lv_obj_set_height(ui_ButState, 32);
+    lv_obj_set_x(ui_ButState, -90);
+    lv_obj_set_y(ui_ButState, -7);
+    lv_obj_set_align(ui_ButState, LV_ALIGN_BOTTOM_MID);
+    lv_obj_add_flag(ui_ButState, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
+    lv_obj_remove_flag(ui_ButState, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_bg_color(ui_ButState, lv_color_hex(0xF03737), LV_PART_MAIN | LV_STATE_CHECKED);
+    lv_obj_set_style_bg_opa(ui_ButState, 255, LV_PART_MAIN | LV_STATE_CHECKED);
 
-    ui_StateLabel = lv_label_create(ui_StateBtn);
-    lv_obj_set_width(ui_StateLabel, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_StateLabel, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_align(ui_StateLabel, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_StateLabel, LV_SYMBOL_PLAY);
-
-    ui_TickVolUnit = lv_label_create(ui_ChartPage);
-    lv_obj_set_width(ui_TickVolUnit, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_TickVolUnit, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_align(ui_TickVolUnit, LV_ALIGN_CENTER);
-    lv_obj_set_pos(ui_TickVolUnit, -105, 75);
-    lv_label_set_text(ui_TickVolUnit, "V");
-
-    ui_TickCurUnit = lv_label_create(ui_ChartPage);
-    lv_obj_set_width(ui_TickCurUnit, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_TickCurUnit, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_align(ui_TickCurUnit, LV_ALIGN_CENTER);
-    lv_obj_set_pos(ui_TickCurUnit, 105, 75);
-    lv_label_set_text(ui_TickCurUnit, "mA");
-
-
-    // 设置图表为循环更新模式
-    lv_chart_set_update_mode(ui_DataChart, LV_CHART_UPDATE_MODE_CIRCULAR);
-
-    // 添加数据系列
-    lv_chart_series_t * ui_DataChart_series_1 = lv_chart_add_series(ui_DataChart, lv_color_hex(0xE36666),
-                                                                 LV_CHART_AXIS_PRIMARY_Y);
-    lv_chart_set_ext_y_array(ui_DataChart, ui_DataChart_series_1, ui_DataChart_vol_array);
-
-    lv_chart_series_t * ui_DataChart_series_2 = lv_chart_add_series(ui_DataChart, lv_color_hex(0x42AA49),
-                                                                 LV_CHART_AXIS_SECONDARY_Y);
-    lv_chart_set_ext_y_array(ui_DataChart, ui_DataChart_series_2, ui_DataChart_cur_array);
-
-    // btn event
-    lv_obj_add_event_cb(ui_StateBtn, _ui_Chart_Btn_cb, LV_EVENT_CLICKED, NULL);
+    ui_LabelState = lv_label_create(ui_ButState);
+    lv_obj_set_width(ui_LabelState, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_LabelState, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_align(ui_LabelState, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_LabelState, LV_SYMBOL_PLAY);
 
     // timer
-    chart_update_timer = lv_timer_create(_chart_update_cb, 100, ui_DataChart); // 每100ms更新一次数据
+    // chart_update_timer = lv_timer_create(_chart_update_cb, 100, ui_DataChart); // 每100ms更新一次数据
 
 
 }
 
+
 void ui_ChartPage_screen_destroy(void)
 {
-    lv_timer_del(chart_update_timer);
+    if (chart_update_timer) {
+        lv_timer_del(chart_update_timer);
+        chart_update_timer = NULL;
+    }
+
+    if(ui_ChartPage) lv_obj_del(ui_ChartPage);
+
+    // NULL screen variables
+    ui_ContainChart = NULL;
+    ui_AxisV5 = NULL;
+    ui_AxisV4 = NULL;
+    ui_AxisV3 = NULL;
+    ui_AxisV2 = NULL;
+    ui_AxisV1 = NULL;
+    ui_AxisV = NULL;
+    ui_AxisC = NULL;
+    ui_AxisC1 = NULL;
+    ui_AxisC2 = NULL;
+    ui_AxisC3 = NULL;
+    ui_AxisC4 = NULL;
+    ui_AxisC5 = NULL;
+    ui_PanelVol = NULL;
+    ui_LabelVol = NULL;
+    ui_LabelVolUnit = NULL;
+    ui_PanelCur = NULL;
+    ui_LabelCur1 = NULL;
+    ui_LabelCurUnit = NULL;
+    ui_ButState = NULL;
+    ui_LabelState = NULL;
+
 }
