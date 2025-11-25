@@ -90,6 +90,9 @@ void HardwareInitTask(void *argument)
     // FUSB CC pin dis connect
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_10, GPIO_PIN_RESET);
 
+    // FUSB302 init
+    fusb302_dev_init();
+
     // lcd
     // done in lvgl disp init
 
