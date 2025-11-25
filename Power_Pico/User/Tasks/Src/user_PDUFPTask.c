@@ -19,11 +19,13 @@
   */
 void PDUFPTask(void *argument)
 {
-  // FUSB init
-  fusb302_dev_init();
+  // 快充诱骗时需要另外一个端口也供电，因为快充口会有可能断电
+  // FUSB CC pin connect
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_10, GPIO_PIN_SET);
   // set
-  PD_protocol_set_power_option(&app_pd.protocol, PD_POWER_OPTION_MAX_9V);
-  PD_protocol_set_PPS(&app_pd.protocol, PPS_V(6.0), PPS_A(2.0), false);
+  PD_protocol_set_power_option(&app_pd.protocol, PD_POWER_OPTION_MAX_20V);
+  PD_protocol_set_PPS(&app_pd.protocol, PPS_V(5.0), PPS_A(1.0), false);
+  // 可以检测status_power来判断是否有PPS供电
 	while(1)
 	{
     if (fusb302_timer() || HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_4) == GPIO_PIN_RESET) {

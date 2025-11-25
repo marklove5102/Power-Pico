@@ -34,23 +34,7 @@ osThreadId_t HardwareInitTaskHandle;
 const osThreadAttr_t HardwareInitTask_attributes = {
   .name = "HardwareInitTask",
   .stack_size = 128 * 10,
-  .priority = (osPriority_t) osPriorityHigh3,
-};
-
-//Data process task
-osThreadId_t PDUFPTaskHandle;
-const osThreadAttr_t PDUFPTask_attributes = {
-  .name = "PDUFPTask",
-  .stack_size = 128 * 2,
-  .priority = (osPriority_t) osPriorityLow7,
-};
-
-//Key task
-osThreadId_t KeyTaskHandle;
-const osThreadAttr_t KeyTask_attributes = {
-  .name = "KeyTask",
-  .stack_size = 128 * 1,
-  .priority = (osPriority_t) osPriorityNormal,
+  .priority = (osPriority_t) osPriorityHigh,
 };
 
 // message task
@@ -58,10 +42,26 @@ osThreadId_t MessageTaskHandle;
 const osThreadAttr_t MessageTask_attributes = {
   .name = "MessageTask",
   .stack_size = 128 * 1,
-  .priority = (osPriority_t) osPriorityHigh,
+  .priority = (osPriority_t) osPriorityNormal2,
 };
 
-//LVGL Handler task
+// Key task
+osThreadId_t KeyTaskHandle;
+const osThreadAttr_t KeyTask_attributes = {
+  .name = "KeyTask",
+  .stack_size = 128 * 1,
+  .priority = (osPriority_t) osPriorityNormal,
+};
+
+// PDUFP task
+osThreadId_t PDUFPTaskHandle;
+const osThreadAttr_t PDUFPTask_attributes = {
+  .name = "PDUFPTask",
+  .stack_size = 128 * 2,
+  .priority = (osPriority_t) osPriorityLow2,
+};
+
+// LVGL Handler task
 osThreadId_t LvHandlerTaskHandle;
 const osThreadAttr_t LvHandlerTask_attributes = {
   .name = "LvHandlerTask",
