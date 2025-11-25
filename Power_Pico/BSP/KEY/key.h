@@ -19,10 +19,10 @@ extern "C" {
 #define KEYB_PIN	GPIO_PIN_0
 #define KEYB HAL_GPIO_ReadPin(KEYB_PORT,KEYB_PIN)
 
-//KEYY
-#define KEYY_PORT	GPIOA
-#define KEYY_PIN	GPIO_PIN_4
-#define KEYY HAL_GPIO_ReadPin(KEYY_PORT,KEYY_PIN)
+//KEYN
+#define KEYN_PORT	GPIOA
+#define KEYN_PIN	GPIO_PIN_4
+#define KEYN HAL_GPIO_ReadPin(KEYN_PORT,KEYN_PIN)
 
 //KEYL
 #define KEYL_PORT	GPIOA
@@ -34,10 +34,10 @@ extern "C" {
 #define KEYR_PIN	GPIO_PIN_2
 #define KEYR HAL_GPIO_ReadPin(KEYR_PORT,KEYR_PIN)
 
-//KEYN
-#define KEYN_PORT	GPIOA
-#define KEYN_PIN	GPIO_PIN_1
-#define KEYN HAL_GPIO_ReadPin(KEYN_PORT,KEYN_PIN)
+//KEYY
+#define KEYY_PORT	GPIOA
+#define KEYY_PIN	GPIO_PIN_1
+#define KEYY HAL_GPIO_ReadPin(KEYY_PORT,KEYY_PIN)
 
 void Key_Port_Init(void);
 uint8_t KeyScan(uint8_t mode);
