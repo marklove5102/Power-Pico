@@ -66,12 +66,12 @@ void lv_port_disp_init(void)
      * -----------------------------------*/
     lv_display_t * disp = lv_display_create(MY_DISP_HOR_RES, MY_DISP_VER_RES);
     lv_display_set_flush_cb(disp, disp_flush);
-#define BUFFER_METHOD 2
+#define BUFFER_METHOD 1
 #if BUFFER_METHOD == 1
     /* Example 1
      * One buffer for partial rendering*/
     LV_ATTRIBUTE_MEM_ALIGN
-    static uint8_t buf_1_1[MY_DISP_HOR_RES * 10 * BYTE_PER_PIXEL];            /*A buffer for 10 rows*/
+    static uint8_t buf_1_1[MY_DISP_HOR_RES * MY_DISP_VER_RES / 4 * BYTE_PER_PIXEL];
     lv_display_set_buffers(disp, buf_1_1, NULL, sizeof(buf_1_1), LV_DISPLAY_RENDER_MODE_PARTIAL);
 #elif BUFFER_METHOD == 2
 
