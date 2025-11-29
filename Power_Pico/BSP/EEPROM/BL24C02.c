@@ -137,7 +137,7 @@ bool EEPROM_UpdateCommand_Check(void)
 
 void Sys_Set_BacklightLevel(uint8_t level)
 {
-	if(level <= 100 && level >= 10) {
+	if(level <= 100 && level >= 0) {
 		sys_settings.backlight_level = level;
 		LCD_Set_Light(level);
 	}
