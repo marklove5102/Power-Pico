@@ -3,16 +3,16 @@
 
 void Key_Port_Init(void)
 {
-  GPIO_InitTypeDef GPIO_InitStruct = {0};
+	GPIO_InitTypeDef GPIO_InitStruct = {0};
 
-  /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOA_CLK_ENABLE();
+	/* GPIO Ports Clock Enable */
+	__HAL_RCC_GPIOA_CLK_ENABLE();
 
-  /*Configure GPIO pin : PA0 */
-  GPIO_InitStruct.Pin = KEYB_PIN | KEYY_PIN | KEYL_PIN | KEYR_PIN | KEYN_PIN;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
-  HAL_GPIO_Init(KEYB_PORT, &GPIO_InitStruct);
+	/*Configure GPIO pin : PA0 */
+	GPIO_InitStruct.Pin = KEYB_PIN | KEYY_PIN | KEYL_PIN | KEYR_PIN | KEYN_PIN;
+	GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+	GPIO_InitStruct.Pull = GPIO_PULLUP;
+	HAL_GPIO_Init(KEYB_PORT, &GPIO_InitStruct);
 }
 
 // mode: 0 - sigle press, 1 - long press
@@ -49,7 +49,7 @@ uint8_t KeyScan(uint8_t mode)
 	// 松开才有效
 	if ( key_down && KEYB && KEYY && KEYL && KEYR && KEYN )
 	{
-		osDelay(3);//ensure the key
+		osDelay(3); // ensure the key
 		if(KEYB && KEYY && KEYL && KEYR && KEYN)
 		{
 			key_up = 1;
