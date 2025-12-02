@@ -134,6 +134,8 @@ static inline uint8_t read_pressed(GPIO_TypeDef* port, uint16_t pin, uint8_t act
  * @brief 扫描一次，若有事件则通过 out_evt 返回
  * @param out_evt  指向事件对象的指针（非空）
  * @return true 有事件；false 无事件
+ * @note 每次调用仅返回一个事件，优先级顺序：DOWN/UP -> CLICK -> LONG -> REPEAT,
+ * @note 返回事件后可以检测掩码，查看是否同时按下键，用于组合逻辑Key_GetPressedMask();
  */
 bool Key_Scan(key_event_t* out_evt)
 {
@@ -205,10 +207,7 @@ bool Key_Scan(key_event_t* out_evt)
     for(uint8_t i=0; i<KEY_ID_MAX; ++i){
         key_slot_t* k = &g_key.slot[i];
         if(!k->registered || !k->stable_pressed) continue;
-
-        uint32_t bit = KEY_BIT(i);
-        bool long_allowed = (g_key.long_enable_mask & bit) != 0;
-        if(!long_allowed) continue;
+        if(!(g_key.long_enable_mask & KEY_BIT(i))) continue;
 
         uint32_t held = TICK_DIFF(now, k->press_tick);
 

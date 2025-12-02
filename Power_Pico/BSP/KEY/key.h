@@ -74,7 +74,7 @@ typedef struct {
 } key_event_t;
 
 /**
- * @brief 扫描模式（可组合）
+ * @brief 扫描模式（可用位或"|"组合）
  */
 typedef enum {
     KEY_MODE_REPORT_DOWN_UP   = 0x01,   // 上报 DOWN/UP
