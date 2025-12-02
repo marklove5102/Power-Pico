@@ -32,17 +32,17 @@ static int current_panel_index = 0; // 当前选中的 panel 索引
 // event funtions
 
 #include "key.h"
-void ui_set_page_key_handler(uint8_t key_id)
+void ui_set_page_key_handler(void *key_event)
 {
     int panel_count = sizeof(panels) / sizeof(panels[0]);
-    if(key_id == KEYB_NUM) { // key boot
+    if(((key_event_t*)key_event)->id == KEY_ID_B && ((key_event_t*)key_event)->type == KEY_EVT_CLICK) { // key boot
         lv_lib_pm_next();
-    } if (key_id == KEYL_NUM) { // key left
+    } if (((key_event_t*)key_event)->id == KEY_ID_L && ((key_event_t*)key_event)->type == KEY_EVT_CLICK) { // key left
         lv_obj_clear_state(panels[current_panel_index], LV_STATE_CHECKED);
         current_panel_index = (current_panel_index - 1 + panel_count) % panel_count;
         lv_obj_add_state(panels[current_panel_index], LV_STATE_CHECKED);
         lv_obj_scroll_to_view(panels[current_panel_index], LV_ANIM_ON);
-    } else if (key_id == KEYR_NUM) { // key right
+    } else if (((key_event_t*)key_event)->id == KEY_ID_R && ((key_event_t*)key_event)->type == KEY_EVT_CLICK) { // key right
         lv_obj_clear_state(panels[current_panel_index], LV_STATE_CHECKED);
         current_panel_index = (current_panel_index + 1) % panel_count;
         lv_obj_add_state(panels[current_panel_index], LV_STATE_CHECKED);
@@ -51,13 +51,15 @@ void ui_set_page_key_handler(uint8_t key_id)
         switch(current_panel_index) {
             // Screen Brightness
             case 0:
-                if (key_id == KEYY_NUM) {
+                if (((key_event_t*)key_event)->id == KEY_ID_Y &&
+                    (((key_event_t*)key_event)->type == KEY_EVT_CLICK || ((key_event_t*)key_event)->type == KEY_EVT_REPEAT)) { // key yes
                     int16_t slider_value = lv_slider_get_value(ui_SliderBL);
                     slider_value += 10;
                     if(slider_value > 100) slider_value = 100;
                     lv_slider_set_value(ui_SliderBL, slider_value, LV_ANIM_ON);
                     ui_set_back_light_level(slider_value);
-                } else if (key_id == KEYN_NUM) {
+                } else if (((key_event_t*)key_event)->id == KEY_ID_N &&
+                            (((key_event_t*)key_event)->type == KEY_EVT_CLICK || ((key_event_t*)key_event)->type == KEY_EVT_REPEAT)) { // key neg
                     int16_t slider_value = lv_slider_get_value(ui_SliderBL);
                     slider_value -= 10;
                     if(slider_value < 10) slider_value = 10;
@@ -67,10 +69,10 @@ void ui_set_page_key_handler(uint8_t key_id)
                 break;
             // key sound
             case 1:
-                if (key_id == KEYY_NUM) {
+                if (((key_event_t*)key_event)->id == KEY_ID_Y && ((key_event_t*)key_event)->type == KEY_EVT_CLICK) { // key yes
                     lv_obj_add_state(ui_SwitchKS, LV_STATE_CHECKED);
                     ui_set_key_sound_enable(1);
-                } else if(key_id == KEYN_NUM) {
+                } else if (((key_event_t*)key_event)->id == KEY_ID_N && ((key_event_t*)key_event)->type == KEY_EVT_CLICK) { // key neg
                     lv_obj_clear_state(ui_SwitchKS, LV_STATE_CHECKED);
                     ui_set_key_sound_enable(0);
                 }
@@ -84,9 +86,9 @@ void ui_set_page_key_handler(uint8_t key_id)
             // chose rotation
             case 3:
                 uint16_t rotation = ui_get_display_rotation();
-                if (key_id == KEYY_NUM) {
+                if (((key_event_t*)key_event)->id == KEY_ID_Y && ((key_event_t*)key_event)->type == KEY_EVT_CLICK) { // key yes
                     rotation = (rotation + 360 + 90) % 360;
-                } else if(key_id == KEYN_NUM) {
+                } else if (((key_event_t*)key_event)->id == KEY_ID_N && ((key_event_t*)key_event)->type == KEY_EVT_CLICK) { // key neg
                     rotation = (rotation + 360 - 90) % 360;
                 }
                 if (rotation == 0) {

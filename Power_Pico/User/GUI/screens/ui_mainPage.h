@@ -8,7 +8,7 @@ extern "C" {
 // SCREEN: ui_Screen1
 void ui_main_screen_init(void);
 void ui_main_screen_destroy(void);
-void ui_main_page_key_handler(uint8_t key_id);
+void ui_main_page_key_handler(void *key_event);
 
 extern lv_obj_t * ui_HomeScreen;
 

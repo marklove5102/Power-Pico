@@ -59,9 +59,11 @@ static void _chart_update_cb(lv_timer_t * timer) {
 }
 
 #include "key.h"
-void ui_chart_page_key_handler(uint8_t key_id)
+void ui_chart_page_key_handler(void* key_event)
 {
-    if(key_id == KEYB_NUM) {
+    if(((key_event_t*)key_event)->id == KEY_ID_B &&
+        ((key_event_t*)key_event)->type == KEY_EVT_CLICK)
+    {
         lv_lib_pm_next();
     }
 }

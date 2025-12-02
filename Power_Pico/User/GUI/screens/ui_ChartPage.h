@@ -14,7 +14,7 @@ extern "C" {
 extern void ui_ChartPage_screen_init(void);
 extern void ui_ChartPage_screen_destroy(void);
 extern lv_obj_t * ui_ChartPage;
-void ui_chart_page_key_handler(uint8_t key_id);
+void ui_chart_page_key_handler(void *key_event);
 
 #ifdef __cplusplus
 } /*extern "C"*/
