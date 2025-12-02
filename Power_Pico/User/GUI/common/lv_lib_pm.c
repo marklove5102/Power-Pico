@@ -107,10 +107,10 @@ Page_t* lv_lib_pm_get_current_page(void) {
  * 处理按键事件，调用当前页面的按键事件处理函数
  * @param key_id 按键ID
  */
-void lv_lib_pm_handle_key_event(uint8_t key_id) {
+void lv_lib_pm_handle_key_event(void* key_event) {
     Page_t* current_page = lv_lib_pm_get_current_page();
     if (current_page && current_page->key_event_handler) {
-        current_page->key_event_handler(key_id); // 调用当前页面的按键事件处理函数
+        current_page->key_event_handler(key_event); // 调用当前页面的按键事件处理函数
     } else {
         LV_LOG_WARN("No key event handler for current page\n");
     }
