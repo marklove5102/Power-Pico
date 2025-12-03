@@ -4,6 +4,7 @@
 // Project name: PowerPico
 
 #include "../ui.h"
+#include "./ui_PPSPage.h"
 
 lv_obj_t * ui_SetPage = NULL;
 // backlight
@@ -22,11 +23,15 @@ static lv_obj_t * ui_LabelLang = NULL;
 static lv_obj_t * ui_PanelRotate = NULL;
 static lv_obj_t * ui_LabelRotation = NULL;
 static lv_obj_t * ui_LabelRotNum = NULL;
+// enable PPS, goto PPS page
+static lv_obj_t * ui_PanelPPS = NULL;
+static lv_obj_t * ui_SwitchPPS = NULL;
+static lv_obj_t * ui_LabelPPS = NULL;
 // about
 static lv_obj_t * ui_PanelAbout = NULL;
 static lv_obj_t * ui_LabelAbout = NULL;
 
-static lv_obj_t * panels[5]; // 存储所有 panel 的指针
+static lv_obj_t * panels[6]; // 存储所有 panel 的指针
 static int current_panel_index = 0; // 当前选中的 panel 索引
 
 // event funtions
@@ -38,7 +43,7 @@ void ui_set_page_key_handler(void *key_event)
     // key boot
     if (((key_event_t*)key_event)->id == KEY_ID_B && ((key_event_t*)key_event)->type == KEY_EVT_CLICK)
     {
-        lv_lib_pm_next();
+        lv_lib_pm_goto_first();
     }
     // key left
     if (((key_event_t*)key_event)->id == KEY_ID_L && ((key_event_t*)key_event)->type == KEY_EVT_CLICK)
@@ -57,7 +62,7 @@ void ui_set_page_key_handler(void *key_event)
         lv_obj_scroll_to_view(panels[current_panel_index], LV_ANIM_ON);
     }
     // key yes or key neg
-    else
+    else if(((key_event_t*)key_event)->id == KEY_ID_Y || ((key_event_t*)key_event)->id == KEY_ID_N)
     {
         switch(current_panel_index)
         {
@@ -126,14 +131,23 @@ void ui_set_page_key_handler(void *key_event)
                 ui_full_screen_refresh(ui_SetPage);
                 break;
 
-            // about
+            // PPS page
             case 4:
+                lv_lib_pm_goto("PPS Page", NULL); // 跳转到 PPS 页面
+                break;
+            // about
+            case 5:
                 // do nothing
                 break;
         }
         // save settings to eeprom
         ui_system_settings_save();
     }
+}
+
+static void on_setpage_loaded(lv_event_t * e) {
+    // 当 SetPage 页面加载完成后，滚动到当前选中的 panel
+    lv_obj_scroll_to_view(panels[current_panel_index], LV_ANIM_ON);
 }
 
 static void _setting_init(void) {
@@ -267,11 +281,34 @@ void ui_SetPage_screen_init(void)
     lv_label_set_text(ui_LabelRotNum, "< 180 >");
     lv_obj_set_style_text_font(ui_LabelRotNum, &lv_font_montserrat_16, LV_PART_MAIN | LV_STATE_DEFAULT);
 
+    ui_PanelPPS = lv_obj_create(ui_SetPage);
+    lv_obj_set_width(ui_PanelPPS, 234);
+    lv_obj_set_height(ui_PanelPPS, 45);
+    lv_obj_set_x(ui_PanelPPS, 0);
+    lv_obj_set_y(ui_PanelPPS, 225);
+    lv_obj_set_align(ui_PanelPPS, LV_ALIGN_TOP_MID);
+    lv_obj_add_flag(ui_PanelPPS, LV_OBJ_FLAG_CHECKABLE);     /// Flags
+    lv_obj_remove_flag(ui_PanelPPS, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_bg_color(ui_PanelPPS, lv_color_hex(0x606060), LV_PART_MAIN | LV_STATE_CHECKED);
+    lv_obj_set_style_bg_opa(ui_PanelPPS, 255, LV_PART_MAIN | LV_STATE_CHECKED);
+
+    ui_SwitchPPS = lv_switch_create(ui_PanelPPS);
+    lv_obj_set_width(ui_SwitchPPS, 50);
+    lv_obj_set_height(ui_SwitchPPS, 25);
+    lv_obj_set_align(ui_SwitchPPS, LV_ALIGN_RIGHT_MID);
+
+    ui_LabelPPS = lv_label_create(ui_PanelPPS);
+    lv_obj_set_width(ui_LabelPPS, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_LabelPPS, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_align(ui_LabelPPS, LV_ALIGN_LEFT_MID);
+    lv_label_set_text(ui_LabelPPS, "PD Setting");
+    lv_obj_set_style_text_font(ui_LabelPPS, &lv_font_montserrat_16, LV_PART_MAIN | LV_STATE_DEFAULT);
+
     ui_PanelAbout = lv_obj_create(ui_SetPage);
     lv_obj_set_width(ui_PanelAbout, 234);
     lv_obj_set_height(ui_PanelAbout, 100);
     lv_obj_set_x(ui_PanelAbout, 0);
-    lv_obj_set_y(ui_PanelAbout, 225);
+    lv_obj_set_y(ui_PanelAbout, 275);
     lv_obj_set_align(ui_PanelAbout, LV_ALIGN_TOP_MID);
     lv_obj_add_flag(ui_PanelAbout, LV_OBJ_FLAG_CHECKABLE);     /// Flags
     lv_obj_remove_flag(ui_PanelAbout, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
@@ -281,7 +318,7 @@ void ui_SetPage_screen_init(void)
     ui_LabelAbout = lv_label_create(ui_PanelAbout);
     lv_obj_set_width(ui_LabelAbout, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_LabelAbout, LV_SIZE_CONTENT);    /// 1
-    lv_label_set_text(ui_LabelAbout, "About\nPower-Pico\nA uA current meter\nV 1.0.0");
+    lv_label_set_text(ui_LabelAbout, "About\nPower-Pico\nThe uA current meter\nV 1.0.0");
     lv_obj_set_style_text_font(ui_LabelAbout, &lv_font_montserrat_16, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     // init setting values
@@ -292,9 +329,12 @@ void ui_SetPage_screen_init(void)
     panels[1] = ui_PanelKS;
     panels[2] = ui_PanelLang;
     panels[3] = ui_PanelRotate;
-    panels[4] = ui_PanelAbout;
+    panels[4] = ui_PanelPPS;
+    panels[5] = ui_PanelAbout;
     lv_obj_add_state(panels[current_panel_index], LV_STATE_CHECKED);
-    lv_obj_scroll_to_view(panels[current_panel_index], LV_ANIM_ON);
+
+    //
+    lv_obj_add_event_cb(ui_SetPage, on_setpage_loaded, LV_EVENT_SCREEN_LOADED, NULL);
 
 }
 

@@ -350,31 +350,4 @@ void ui_ChartPage_screen_destroy(void)
         chart_update_timer = NULL;
     }
 
-    if(ui_ChartPage) lv_obj_del(ui_ChartPage);
-
-    // NULL screen variables
-    ui_ContainChart = NULL;
-    ui_AxisV5 = NULL;
-    ui_AxisV4 = NULL;
-    ui_AxisV3 = NULL;
-    ui_AxisV2 = NULL;
-    ui_AxisV1 = NULL;
-    ui_AxisV = NULL;
-    ui_AxisC = NULL;
-    ui_AxisC1 = NULL;
-    ui_AxisC2 = NULL;
-    ui_AxisC3 = NULL;
-    ui_AxisC4 = NULL;
-    ui_AxisC5 = NULL;
-    ui_PanelVol = NULL;
-    ui_LabelVol = NULL;
-    ui_LabelVolUnit = NULL;
-    ui_PanelCur = NULL;
-    ui_LabelCur1 = NULL;
-    ui_LabelCurUnit = NULL;
-    ui_ButState = NULL;
-    ui_LabelState = NULL;
-    ui_LineVol = NULL;
-    ui_LineCur = NULL;
-
 }
