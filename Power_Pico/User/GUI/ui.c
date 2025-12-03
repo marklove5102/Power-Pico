@@ -8,7 +8,7 @@
 #include "./screens/ui_mainPage.h"
 #include "./screens/ui_chartPage.h"
 #include "./screens/ui_SetPage.h"
-
+#include "./screens/ui_PPSPage.h"
 
 //////////// interface for system hw settings ///////////
 
@@ -74,6 +74,13 @@ Page_t pages[] = {
         .key_event_handler = ui_set_page_key_handler,
         .name = "Set Page"
     },
+    {
+        .init = ui_PPSPage_screen_init,
+        .deinit = ui_PPSPage_screen_destroy,
+        .page_obj = &ui_PPSPage,
+        .key_event_handler = ui_pps_page_key_handler,
+        .name = "PPS Page"
+    },
     // 可以在这里添加更多页面
 };
 
@@ -135,6 +142,6 @@ void ui_init(void)
 
     // start up, just load one time only
     ui_StartPage_screen_init();
-    lv_scr_load(ui_StartPage);
+    lv_screen_load(ui_StartPage);
     _ui_Start_animation();
 }
