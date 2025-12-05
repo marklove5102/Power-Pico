@@ -5,7 +5,6 @@
 
 #include "../ui.h"
 #include "ui_mainPage.h"
-#include "data_queue.h" // bsp/data_queue.h for voltage/current queues
 #include "math.h"
 
 lv_obj_t * ui_HomeScreen = NULL;
@@ -138,8 +137,8 @@ static void _flush_timer_cb()
     }
     float voltage = 0.0;
     float current = 0.0;
-    current = queue_average(global_current_queue);
-    voltage = queue_average(global_voltage_queue);
+    current = ui_get_current();
+    voltage = ui_get_voltage();
     set_val_cur_label(voltage, current);
 }
 

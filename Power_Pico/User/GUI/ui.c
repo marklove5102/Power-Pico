@@ -3,6 +3,8 @@
 
 #include "BL24C02.h" // system settings
 #include "rtc.h"     // elapsed time
+#include "data_queue.h" // bsp/data_queue.h for voltage/current queues
+
 #include "./ui.h"
 #include "./screens/ui_StartPage.h"
 #include "./screens/ui_mainPage.h"
@@ -28,6 +30,14 @@ bool ui_get_key_sound_enable(void) {
 
 uint16_t ui_get_display_rotation(void) {
     return Sys_Get_Rotation();
+}
+
+float ui_get_voltage(void) {
+    return queue_average(global_voltage_queue);
+}
+
+float ui_get_current(void) {
+    return queue_average(global_current_queue);
 }
 
 // set functions

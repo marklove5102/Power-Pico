@@ -29,6 +29,8 @@ void ui_GetElapsedTime_HMS(uint8_t *hours, uint8_t *minutes, uint8_t *seconds);
 uint8_t ui_get_back_light_level(void);
 bool ui_get_key_sound_enable(void);
 uint16_t ui_get_display_rotation(void);
+float ui_get_voltage(void);
+float ui_get_current(void);
 
 // set functions
 
