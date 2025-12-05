@@ -38,10 +38,15 @@ enum {
 };
 typedef uint8_t status_power_t;
 
+enum {
+    PD_SYS_STATE_INIT = 0,
+    PD_SYS_STATE_READY,
+    PD_SYS_STATE_ERROR
+};
+typedef uint8_t PD_user_state_t;
+
 typedef struct
 {
-    uint8_t state;
-    //uint8_t pd_ic_initial;
     PD_protocol_t protocol;
 
     // Power ready power
@@ -77,6 +82,9 @@ extern App_PD_t app_pd;
 
 uint8_t fusb302_dev_init(void);
 void handle_FUSB302_event(FUSB302_event_t events);
+bool is_power_ready(void);
+bool is_PPS_ready(void);
+void send_power_request(void);
 
 #ifdef __cplusplus
 }

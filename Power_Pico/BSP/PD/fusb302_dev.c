@@ -171,7 +171,7 @@ bool fusb302_timer(void)
 
 bool is_power_ready(void) { return app_pd.status_power == STATUS_POWER_TYP; }
 bool is_PPS_ready(void)   { return app_pd.status_power == STATUS_POWER_PPS; }
-
+void send_power_request(void) { app_pd.send_request = 1; }
 
 uint8_t fusb302_dev_init(void) {
     fusb302_dev.i2c_address = 0x22<<1; // FUSB302 I2C address
