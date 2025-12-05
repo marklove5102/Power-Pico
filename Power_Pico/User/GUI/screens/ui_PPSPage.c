@@ -4,6 +4,7 @@
 // Project name: PowerPico
 
 #include "../ui.h"
+#include "data_queue.h" // bsp/data_queue.h for voltage/current queues
 
 lv_obj_t * ui_PPSPage = NULL;
 static lv_obj_t * ui_PanelPPSVol = NULL;
@@ -43,14 +44,33 @@ static lv_obj_t * ui_LabelSwitch2fixed = NULL;
 static lv_obj_t * ui_BtnClose = NULL;
 static lv_obj_t * ui_LabelClose = NULL;
 
+static lv_timer_t* ui_pps_timer = NULL;
+
+static lv_obj_t * panels[8];        // 存储所有 panel 的指针
+static int current_panel_index = 0; // 当前选中的 panel 索引
+
 // event funtions
+
+static void _flush_timer_cb(void) {
+    // 刷新 PPS 电压电流显示
+    char buf[5];
+    float voltage = 0.0;
+    float current = 0.0;
+    current = queue_average(global_current_queue); // uA
+    voltage = queue_average(global_voltage_queue); // V
+    sprintf(buf, "%.2f", voltage);
+    lv_label_set_text(ui_LabelPPSVol, buf);
+    sprintf(buf, "%.2f", current/1000000.0); // 转换为 A
+    lv_label_set_text(ui_LabelPPSCur, buf);
+}
+
 
 #include "key.h"
 void ui_pps_page_key_handler(void* key_event)
 {
     if(((key_event_t*)key_event)->id == KEY_ID_B && ((key_event_t*)key_event)->type == KEY_EVT_CLICK)
     {
-        lv_lib_pm_prev();
+        lv_lib_pm_goto("Set Page", NULL);
     }
 }
 
@@ -168,6 +188,9 @@ void ui_PPSPage_screen_init(void)
     lv_obj_set_align(ui_BtnSet2, LV_ALIGN_CENTER);
     lv_obj_add_flag(ui_BtnSet2, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
     lv_obj_remove_flag(ui_BtnSet2, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_border_color(ui_BtnSet2, lv_color_hex(0xF40F0F), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_opa(ui_BtnSet2, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_width(ui_BtnSet2, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_LabelSet2 = lv_label_create(ui_BtnSet2);
     lv_obj_set_width(ui_LabelSet2, LV_SIZE_CONTENT);   /// 1
@@ -184,6 +207,9 @@ void ui_PPSPage_screen_init(void)
     lv_obj_set_align(ui_BtnSet3, LV_ALIGN_CENTER);
     lv_obj_add_flag(ui_BtnSet3, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
     lv_obj_remove_flag(ui_BtnSet3, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_border_color(ui_BtnSet3, lv_color_hex(0xF40F0F), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_opa(ui_BtnSet3, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_width(ui_BtnSet3, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_LabelSet3 = lv_label_create(ui_BtnSet3);
     lv_obj_set_width(ui_LabelSet3, LV_SIZE_CONTENT);   /// 1
@@ -200,6 +226,9 @@ void ui_PPSPage_screen_init(void)
     lv_obj_set_align(ui_BtnSet4, LV_ALIGN_CENTER);
     lv_obj_add_flag(ui_BtnSet4, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
     lv_obj_remove_flag(ui_BtnSet4, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_border_color(ui_BtnSet4, lv_color_hex(0xF40F0F), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_opa(ui_BtnSet4, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_width(ui_BtnSet4, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_LabelSet4 = lv_label_create(ui_BtnSet4);
     lv_obj_set_width(ui_LabelSet4, LV_SIZE_CONTENT);   /// 1
@@ -216,6 +245,9 @@ void ui_PPSPage_screen_init(void)
     lv_obj_set_align(ui_BtnSet5, LV_ALIGN_CENTER);
     lv_obj_add_flag(ui_BtnSet5, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
     lv_obj_remove_flag(ui_BtnSet5, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_border_color(ui_BtnSet5, lv_color_hex(0xF40F0F), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_opa(ui_BtnSet5, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_width(ui_BtnSet5, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_LabelSet5 = lv_label_create(ui_BtnSet5);
     lv_obj_set_width(ui_LabelSet5, LV_SIZE_CONTENT);   /// 1
@@ -232,6 +264,9 @@ void ui_PPSPage_screen_init(void)
     lv_obj_set_align(ui_BtnSet6, LV_ALIGN_CENTER);
     lv_obj_add_flag(ui_BtnSet6, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
     lv_obj_remove_flag(ui_BtnSet6, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_border_color(ui_BtnSet6, lv_color_hex(0xF40F0F), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_opa(ui_BtnSet6, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_width(ui_BtnSet6, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_LabelSet6 = lv_label_create(ui_BtnSet6);
     lv_obj_set_width(ui_LabelSet6, LV_SIZE_CONTENT);   /// 1
@@ -350,6 +385,10 @@ void ui_PPSPage_screen_init(void)
     lv_obj_remove_flag(ui_BtnSwitch, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
     lv_obj_set_style_bg_color(ui_BtnSwitch, lv_color_hex(0x725C08), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_BtnSwitch, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_color(ui_BtnSwitch, lv_color_hex(0xF40F0F), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_opa(ui_BtnSwitch, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_width(ui_BtnSwitch, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+
 
     ui_LabelSwitch2fixed = lv_label_create(ui_BtnSwitch);
     lv_obj_set_width(ui_LabelSwitch2fixed, LV_SIZE_CONTENT);   /// 1
@@ -368,6 +407,9 @@ void ui_PPSPage_screen_init(void)
     lv_obj_remove_flag(ui_BtnClose, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
     lv_obj_set_style_bg_color(ui_BtnClose, lv_color_hex(0x725C08), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_BtnClose, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_color(ui_BtnClose, lv_color_hex(0xF40F0F), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_opa(ui_BtnClose, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_width(ui_BtnClose, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_LabelClose = lv_label_create(ui_BtnClose);
     lv_obj_set_width(ui_LabelClose, LV_SIZE_CONTENT);   /// 1
@@ -376,9 +418,22 @@ void ui_PPSPage_screen_init(void)
     lv_label_set_text(ui_LabelClose, "press here to close PD");
     lv_obj_set_style_text_font(ui_LabelClose, &lv_font_montserrat_18, LV_PART_MAIN | LV_STATE_DEFAULT);
 
+    ui_pps_timer = lv_timer_create(_flush_timer_cb, 500, NULL);
+
+    // store panels in array
+    panels[0] = ui_BtnSet1;
+    panels[1] = ui_BtnSet2;
+    panels[2] = ui_BtnSet3;
+    panels[3] = ui_BtnSet4;
+    panels[4] = ui_BtnSet5;
+    panels[5] = ui_BtnSet6;
+    panels[6] = ui_BtnSwitch;
+    panels[7] = ui_BtnClose;
+    //
+    current_panel_index = 0;
 }
 
 void ui_PPSPage_screen_destroy(void)
 {
-
+    if(ui_pps_timer) lv_timer_delete(ui_pps_timer);
 }
