@@ -5,7 +5,7 @@
 
 #include "../ui.h"
 #include "ui_mainPage.h"
-#include "data_queue.h"
+#include "data_queue.h" // bsp/data_queue.h for voltage/current queues
 #include "math.h"
 
 lv_obj_t * ui_HomeScreen = NULL;
