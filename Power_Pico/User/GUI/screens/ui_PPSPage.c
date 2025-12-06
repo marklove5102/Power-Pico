@@ -230,6 +230,16 @@ void ui_pps_page_key_handler(void* key_event)
     }
 }
 
+
+/////////////////////// para_initialize //////////////////////
+static void _para_init(void) {
+    current_btn_index = 0;
+    pps_voltage_index = 0;
+    pps_panel_index = 1;
+    cur_voltage = 5.0;
+    cur_current = 1.0;
+}
+
 /////////////////////// ui_initialize //////////////////////
 
 void ui_PPSPage_screen_init(void)
@@ -604,7 +614,7 @@ void ui_PPSPage_screen_init(void)
     btns[12] = ui_BtnSwitch;
     btns[13] = ui_BtnClose;
     //
-    current_btn_index = 0;
+    _para_init();
 }
 
 void ui_PPSPage_screen_destroy(void)
