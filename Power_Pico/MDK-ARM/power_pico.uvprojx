@@ -81,7 +81,7 @@
           </BeforeMake>
           <AfterMake>
             <RunUserProg1>1</RunUserProg1>
-            <RunUserProg2>1</RunUserProg2>
+            <RunUserProg2>0</RunUserProg2>
             <UserProg1Name>fromelf.exe --bin -o "$L@L.bin" "#L</UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
@@ -918,6 +918,16 @@
               <FilePath>..\User\GUI\ui.c</FilePath>
             </File>
             <File>
+              <FileName>ui_helpers.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\GUI\ui_helpers.c</FilePath>
+            </File>
+            <File>
+              <FileName>ui_StartPage.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\GUI\screens\ui_StartPage.c</FilePath>
+            </File>
+            <File>
               <FileName>ui_mainPage.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\User\GUI\screens\ui_mainPage.c</FilePath>
@@ -931,11 +941,6 @@
               <FileName>ui_SetPage.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\User\GUI\screens\ui_SetPage.c</FilePath>
-            </File>
-            <File>
-              <FileName>ui_StartPage.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\User\GUI\screens\ui_StartPage.c</FilePath>
             </File>
             <File>
               <FileName>ui_PPSPage.c</FileName>
