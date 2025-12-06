@@ -1,63 +1,12 @@
 // LVGL version: 9.2
 // Project name: PowerPico
 
-#include "BL24C02.h" // system settings
-#include "rtc.h"     // elapsed time
-#include "data_queue.h" // bsp/data_queue.h for voltage/current queues
-
 #include "./ui.h"
 #include "./screens/ui_StartPage.h"
 #include "./screens/ui_mainPage.h"
 #include "./screens/ui_chartPage.h"
 #include "./screens/ui_SetPage.h"
 #include "./screens/ui_PPSPage.h"
-
-//////////// interface for system hw settings ///////////
-
-// get functions
-
-void ui_GetElapsedTime_HMS(uint8_t *hours, uint8_t *minutes, uint8_t *seconds) {
-    GetElapsedTime_HMS(hours, minutes, seconds);
-}
-
-uint8_t ui_get_back_light_level(void) {
-    return Sys_Get_BacklightLevel();
-}
-
-bool ui_get_key_sound_enable(void) {
-    return Sys_Get_KeySoundEnable();
-}
-
-uint16_t ui_get_display_rotation(void) {
-    return Sys_Get_Rotation();
-}
-
-float ui_get_voltage(void) {
-    return queue_average(global_voltage_queue);
-}
-
-float ui_get_current(void) {
-    return queue_average(global_current_queue);
-}
-
-// set functions
-
-void ui_set_back_light_level(uint8_t level) {
-    Sys_Set_BacklightLevel(level);
-}
-
-void ui_set_key_sound_enable(bool enable) {
-    Sys_Set_KeySoundEnable(enable);
-}
-
-void ui_set_display_rotation(uint16_t rotation) {
-    Sys_Set_Rotation(rotation);
-}
-
-// sys save function
-void ui_system_settings_save(void) {
-    EEPROM_SysSetting_Save();
-}
 
 ///////////////////// VARIABLES ////////////////////
 
@@ -98,15 +47,6 @@ Page_t pages[] = {
 #if LV_COLOR_DEPTH != 16
     #error "LV_COLOR_DEPTH should be 16bit to match SquareLine Studio's settings"
 #endif
-
-///////////////////// help funtions ////////////////////
-
-void ui_full_screen_refresh(lv_obj_t * screen) {
-    // 标记整个屏幕为脏区域
-    lv_obj_invalidate(screen);
-    // 或者立即刷新整个屏幕
-    lv_refr_now(NULL);
-}
 
 /////////////////////// Timer //////////////////////
 /**

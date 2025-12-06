@@ -40,37 +40,30 @@ static bool waiting_for_signal = false; // 标志位，表示是否在等待信�
 static lv_obj_t * panels[6]; // 存储所有 panel 的指针
 static int current_panel_index = 0; // 当前选中的 panel 索引
 
-static void show_msgbox(void);
-static void hide_msgbox(void);
+static void show_wait_msgbox(void);
+static void hide_wait_msgbox(void);
+static void show_fail_msgbox(void);
 
 // event funtions
 
-// comunicate with PD UFP Task
-#include "user_PDUFPTask.h"
-
 /////////////////////// Timer //////////////////////
 static void _setting_timer_cb(lv_timer_t * timer) {
-    PD_handle_event_t pd_handle_event;
-    // 非阻塞获取消息
-    if(osMessageQueueGet(PD_handle_event_MsgQueue, &pd_handle_event, NULL, 0)==osOK) {
-        if(pd_handle_event == PD_EVT_PPS_READY) {
-            // 隐藏等待框
-            hide_msgbox();
-            lv_lib_pm_goto("PPS Page", NULL);
-        } else if(pd_handle_event == PD_EVT_PPS_FAILED) {
-            // 隐藏等待框
-            hide_msgbox();
-        }
+    int8_t Msg = 0;
+    Msg = MsgQueueGet_PPS_ready();
+    if(Msg == 1) {
+        // 隐藏等待框
+        hide_wait_msgbox();
+        lv_lib_pm_goto("PPS Page", NULL);
+    } else if(Msg == -1) {
+        // 隐藏等待框
+        hide_wait_msgbox();
+        // 显示失败框
+        show_fail_msgbox();
+        ui_send_pps_stop_msg();
     }
 }
 
-///////////////// outer function ///////////////////
-
-static void _send_pps_start_msg(void) {
-    PD_command_msg_t pd_ui_msg;
-    pd_ui_msg.event = PD_CMD_START;
-    osMessageQueuePut(PD_cmd_MessageQueue, &pd_ui_msg, 0, 1);
-}
+///////////////// key function ///////////////////
 
 #include "key.h"
 void ui_set_page_key_handler(void *key_event)
@@ -174,9 +167,9 @@ void ui_set_page_key_handler(void *key_event)
                 if (((key_event_t*)key_event)->id == KEY_ID_Y && ((key_event_t*)key_event)->type == KEY_EVT_CLICK)
                 {
                     // 发送pps开始信号到PD UFP Task
-                    _send_pps_start_msg();
+                    ui_send_pps_start_msg();
                     // 弹出 msgbox 等待PD完成，并锁住按键操作
-                    show_msgbox();
+                    show_wait_msgbox();
                     // lv_lib_pm_goto("PPS Page", NULL);
                 }
                 break;
@@ -223,8 +216,8 @@ static void _setting_init(void) {
 
 /////////////////////// ui_initialize //////////////////////
 
-// 显示 msgbox
-static void show_msgbox(void) {
+// 显示 PD msgbox
+static void show_wait_msgbox(void) {
 
     // 获取当前视角y pos
     int32_t view_y = lv_obj_get_scroll_top(ui_SetPage);
@@ -251,8 +244,8 @@ static void show_msgbox(void) {
     waiting_for_signal = true;
 }
 
-// 隐藏 msgbox
-static void hide_msgbox(void) {
+// 隐藏 PD msgbox
+static void hide_wait_msgbox(void) {
     if (msgbox) {
         lv_obj_del(msgbox);
         msgbox = NULL;
@@ -261,7 +254,39 @@ static void hide_msgbox(void) {
     waiting_for_signal = false;
 }
 
-// build funtions
+// 定时器回调函数，用于关闭失败弹窗
+static void _fail_msgbox_timer_cb(lv_timer_t * t) {
+    lv_obj_t * mbox = (lv_obj_t *)lv_timer_get_user_data(t);
+    if (mbox) {
+        lv_obj_del(mbox); // 删除 msgbox
+    }
+    lv_timer_del(t); // 删除定时器
+}
+
+// 显示PPS失败提示弹窗
+static void show_fail_msgbox(void) {
+    // 获取当前视角y pos
+    int32_t view_y = lv_obj_get_scroll_top(ui_SetPage);
+    // 创建 msgbox
+    msgbox = lv_obj_create(ui_SetPage);
+    lv_obj_set_size(msgbox, 200, 100);
+    lv_obj_center(msgbox);
+    lv_obj_set_pos(msgbox, 0, view_y);
+    lv_obj_set_style_bg_color(msgbox, lv_color_hex(0xFF0000), LV_PART_MAIN | LV_STATE_DEFAULT); // 红色背景
+    lv_obj_set_style_bg_opa(msgbox, 200, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    // 添加文本
+    lv_obj_t * label = lv_label_create(msgbox);
+    lv_label_set_text(label, "PD Setting Failed!");
+    lv_obj_center(label);
+    lv_obj_set_style_text_font(label, &lv_font_montserrat_18, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    // 设置定时器，2 秒后关闭弹窗
+    lv_timer_t * timer = lv_timer_create(_fail_msgbox_timer_cb, 2000, msgbox); // 传递 msgbox 对象
+    lv_timer_set_repeat_count(timer, 1); // 只执行一次
+}
+
+/////////////////////// ui_initialize //////////////////////
 
 void ui_SetPage_screen_init(void)
 {

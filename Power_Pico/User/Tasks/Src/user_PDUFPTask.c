@@ -30,6 +30,8 @@ static void _timer_callback(void *argument)
         osMessageQueuePut(PD_handle_event_MsgQueue, &ready, 0, 1);
         time_count = 0;
         osTimerStop(PD_UFP_Task_timer_id);
+        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_10, GPIO_PIN_RESET); // FUSB CC pin disconnect
+        _pd_working_status = 0;
     }
 }
 
@@ -63,8 +65,9 @@ void PDUFPTask(void *argument)
         _pd_working_status = 1;
 
       } else if(_pd_working_status && ui_msg.event == PD_CMD_STOP) {
-
-
+        // FUSB CC pin disconnect
+        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_10, GPIO_PIN_RESET);
+        _pd_working_status = 0;
 
       } else if(_pd_working_status && ui_msg.event == PD_CMD_SET_PPS) {
         // 设置PPS电压电流
