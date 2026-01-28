@@ -33,6 +33,10 @@ bool ui_get_key_sound_enable(void) {
     return Sys_Get_KeySoundEnable();
 }
 
+uint8_t ui_get_language_select(void) {
+    return Sys_Get_LanguageSelect();
+}
+
 uint16_t ui_get_display_rotation(void) {
     return Sys_Get_Rotation();
 }
@@ -53,6 +57,10 @@ void ui_set_back_light_level(uint8_t level) {
 
 void ui_set_key_sound_enable(bool enable) {
     Sys_Set_KeySoundEnable(enable);
+}
+
+void ui_set_language_select(uint8_t lang) {
+    Sys_Set_LanguageSelect(lang);
 }
 
 void ui_set_display_rotation(uint16_t rotation) {
