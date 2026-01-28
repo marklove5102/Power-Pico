@@ -20,6 +20,8 @@ void ui_init(void);
 // FONTS
 LV_FONT_DECLARE(ui_font_HeiTi32);
 LV_FONT_DECLARE(ui_font_HeiTi48);
+LV_FONT_DECLARE(ui_font_zhongyuan18);
+LV_FONT_DECLARE(ui_font_zhongyuan20);
 
 // IMAGES AND IMAGE SETS
 LV_IMG_DECLARE(ui_img_chicken_png);
