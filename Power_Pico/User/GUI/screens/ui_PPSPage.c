@@ -91,7 +91,11 @@ static void _switch_pps_panel(void)
         current_btn_index = 8;
         // 设置当前对象红色边框
         lv_obj_set_style_border_width(btns[current_btn_index], 3, LV_PART_MAIN | LV_STATE_DEFAULT);
-        lv_label_set_text(ui_LabelSwitch, "press here to Fixed Set");
+        lv_label_set_text(ui_LabelSwitch, _("press here to Fixed Set"));
+        if(ui_get_language_select() == 0)
+            lv_obj_set_style_text_font(ui_LabelSwitch, &lv_font_montserrat_18, LV_PART_MAIN | LV_STATE_DEFAULT);
+        else
+            lv_obj_set_style_text_font(ui_LabelSwitch, &ui_font_zhongyuan20, LV_PART_MAIN | LV_STATE_DEFAULT);
         _set_label_val_cur();
     }
     else
@@ -103,7 +107,12 @@ static void _switch_pps_panel(void)
         current_btn_index = 0;
         // 设置当前对象红色边框
         lv_obj_set_style_border_width(btns[current_btn_index], 3, LV_PART_MAIN | LV_STATE_DEFAULT);
-        lv_label_set_text(ui_LabelSwitch, "press here to Variable");
+        lv_label_set_text(ui_LabelSwitch, _("press to Step Adjust"));
+        if(ui_get_language_select() == 0)
+            lv_obj_set_style_text_font(ui_LabelSwitch, &lv_font_montserrat_18, LV_PART_MAIN | LV_STATE_DEFAULT);
+        else
+            lv_obj_set_style_text_font(ui_LabelSwitch, &ui_font_zhongyuan20, LV_PART_MAIN | LV_STATE_DEFAULT);
+
     }
 }
 
@@ -572,8 +581,11 @@ void ui_PPSPage_screen_init(void)
     lv_obj_set_width(ui_LabelSwitch, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_LabelSwitch, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_align(ui_LabelSwitch, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_LabelSwitch, "press here to Variable");
-    lv_obj_set_style_text_font(ui_LabelSwitch, &lv_font_montserrat_18, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_label_set_text(ui_LabelSwitch, _("press to Step Adjust"));
+    if(ui_get_language_select() == 0)
+        lv_obj_set_style_text_font(ui_LabelSwitch, &lv_font_montserrat_18, LV_PART_MAIN | LV_STATE_DEFAULT);
+    else
+        lv_obj_set_style_text_font(ui_LabelSwitch, &ui_font_zhongyuan20, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_BtnClose = lv_button_create(ui_PPSPage);
     lv_obj_set_width(ui_BtnClose, 210);
@@ -593,8 +605,11 @@ void ui_PPSPage_screen_init(void)
     lv_obj_set_width(ui_LabelClose, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_LabelClose, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_align(ui_LabelClose, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_LabelClose, "press here to close PD");
-    lv_obj_set_style_text_font(ui_LabelClose, &lv_font_montserrat_18, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_label_set_text(ui_LabelClose, _("press here to close PD"));
+    if(ui_get_language_select() == 0)
+        lv_obj_set_style_text_font(ui_LabelClose, &lv_font_montserrat_18, LV_PART_MAIN | LV_STATE_DEFAULT);
+    else
+        lv_obj_set_style_text_font(ui_LabelClose, &ui_font_zhongyuan20, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_pps_timer = lv_timer_create(_flush_timer_cb, 500, NULL);
 

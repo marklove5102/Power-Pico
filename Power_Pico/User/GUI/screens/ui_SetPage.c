@@ -311,15 +311,18 @@ void ui_SetPage_screen_init(void)
     lv_obj_set_align(ui_SliderBL, LV_ALIGN_BOTTOM_MID);
 
     //Compensating for LVGL9.1 draw crash with bar/slider max value when top-padding is nonzero and right-padding is 0
-    if(lv_obj_get_style_pad_top(ui_SliderBL, LV_PART_MAIN) > 0) lv_obj_set_style_pad_right(ui_SliderBL,
-                                                                                               lv_obj_get_style_pad_right(ui_SliderBL, LV_PART_MAIN) + 1, LV_PART_MAIN);
+    if(lv_obj_get_style_pad_top(ui_SliderBL, LV_PART_MAIN) > 0) lv_obj_set_style_pad_right(ui_SliderBL, lv_obj_get_style_pad_right(ui_SliderBL, LV_PART_MAIN) + 1, LV_PART_MAIN);
     ui_LabelBL = lv_label_create(ui_PanelBL);
     lv_obj_set_width(ui_LabelBL, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_LabelBL, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_x(ui_LabelBL, 0);
     lv_obj_set_y(ui_LabelBL, -5);
-    lv_label_set_text(ui_LabelBL, "Screen Brightness :");
-    lv_obj_set_style_text_font(ui_LabelBL, &lv_font_montserrat_16, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_label_set_text(ui_LabelBL, _("Screen Brightness :"));
+    if(ui_get_language_select() == 0)
+        lv_obj_set_style_text_font(ui_LabelBL, &lv_font_montserrat_16, LV_PART_MAIN | LV_STATE_DEFAULT);
+    else
+        lv_obj_set_style_text_font(ui_LabelBL, &ui_font_zhongyuan18, LV_PART_MAIN | LV_STATE_DEFAULT);
+
 
     ui_PanelKS = lv_obj_create(ui_SetPage);
     lv_obj_set_width(ui_PanelKS, 234);
@@ -342,8 +345,11 @@ void ui_SetPage_screen_init(void)
     lv_obj_set_width(ui_LabelKS, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_LabelKS, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_align(ui_LabelKS, LV_ALIGN_LEFT_MID);
-    lv_label_set_text(ui_LabelKS, "Enable key sound");
-    lv_obj_set_style_text_font(ui_LabelKS, &lv_font_montserrat_16, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_label_set_text(ui_LabelKS, _("Enable key sound"));
+    if(ui_get_language_select() == 0)
+        lv_obj_set_style_text_font(ui_LabelKS, &lv_font_montserrat_16, LV_PART_MAIN | LV_STATE_DEFAULT);
+    else
+        lv_obj_set_style_text_font(ui_LabelKS, &ui_font_zhongyuan18, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_PanelLang = lv_obj_create(ui_SetPage);
     lv_obj_set_width(ui_PanelLang, 234);
@@ -365,8 +371,11 @@ void ui_SetPage_screen_init(void)
     lv_obj_set_width(ui_LabelLang, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_LabelLang, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_align(ui_LabelLang, LV_ALIGN_LEFT_MID);
-    lv_label_set_text(ui_LabelLang, "Enable Chinese");
-    lv_obj_set_style_text_font(ui_LabelLang, &lv_font_montserrat_16, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_label_set_text(ui_LabelLang, _("Enable Chinese"));
+    if(ui_get_language_select() == 0)
+        lv_obj_set_style_text_font(ui_LabelLang, &lv_font_montserrat_16, LV_PART_MAIN | LV_STATE_DEFAULT);
+    else
+        lv_obj_set_style_text_font(ui_LabelLang, &ui_font_zhongyuan18, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_PanelRotate = lv_obj_create(ui_SetPage);
     lv_obj_set_width(ui_PanelRotate, 234);
@@ -383,8 +392,11 @@ void ui_SetPage_screen_init(void)
     lv_obj_set_width(ui_LabelRotation, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_LabelRotation, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_align(ui_LabelRotation, LV_ALIGN_LEFT_MID);
-    lv_label_set_text(ui_LabelRotation, "Chose Rotation");
-    lv_obj_set_style_text_font(ui_LabelRotation, &lv_font_montserrat_16, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_label_set_text(ui_LabelRotation, _("Chose Rotation"));
+    if(ui_get_language_select() == 0)
+        lv_obj_set_style_text_font(ui_LabelRotation, &lv_font_montserrat_16, LV_PART_MAIN | LV_STATE_DEFAULT);
+    else
+        lv_obj_set_style_text_font(ui_LabelRotation, &ui_font_zhongyuan18, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_LabelRotNum = lv_label_create(ui_PanelRotate);
     lv_obj_set_width(ui_LabelRotNum, LV_SIZE_CONTENT);   /// 1
@@ -413,8 +425,11 @@ void ui_SetPage_screen_init(void)
     lv_obj_set_width(ui_LabelPPS, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_LabelPPS, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_align(ui_LabelPPS, LV_ALIGN_LEFT_MID);
-    lv_label_set_text(ui_LabelPPS, "PD Setting");
-    lv_obj_set_style_text_font(ui_LabelPPS, &lv_font_montserrat_16, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_label_set_text(ui_LabelPPS, _("PD Setting"));
+    if(ui_get_language_select() == 0)
+        lv_obj_set_style_text_font(ui_LabelPPS, &lv_font_montserrat_16, LV_PART_MAIN | LV_STATE_DEFAULT);
+    else
+        lv_obj_set_style_text_font(ui_LabelPPS, &ui_font_zhongyuan18, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_PanelAbout = lv_obj_create(ui_SetPage);
     lv_obj_set_width(ui_PanelAbout, 234);
