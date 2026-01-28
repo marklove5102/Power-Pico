@@ -276,7 +276,7 @@
               </OCR_RVCT3>
               <OCR_RVCT4>
                 <Type>1</Type>
-                <StartAddress>0x800c000</StartAddress>
+                <StartAddress>0x8000000</StartAddress>
                 <Size>0x74000</Size>
               </OCR_RVCT4>
               <OCR_RVCT5>
@@ -911,6 +911,11 @@
               <FileName>lv_lib_animation.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\User\GUI\common\lv_lib_animation.c</FilePath>
+            </File>
+            <File>
+              <FileName>lv_i18n.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\GUI\common\lv_i18n.c</FilePath>
             </File>
             <File>
               <FileName>ui.c</FileName>
