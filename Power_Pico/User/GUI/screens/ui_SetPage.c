@@ -132,7 +132,20 @@ void ui_set_page_key_handler(void *key_event)
 
             // language
             case 2:
-                // do nothing
+                // key yes
+                if (((key_event_t*)key_event)->id == KEY_ID_Y && ((key_event_t*)key_event)->type == KEY_EVT_CLICK)
+                {
+                    lv_obj_add_state(ui_SwitchLang, LV_STATE_CHECKED);
+                    ui_set_language_select(1);
+                    lv_i18n_set_locale("en");
+                }
+                // key neg
+                else if (((key_event_t*)key_event)->id == KEY_ID_N && ((key_event_t*)key_event)->type == KEY_EVT_CLICK)
+                {
+                    lv_obj_clear_state(ui_SwitchLang, LV_STATE_CHECKED);
+                    ui_set_language_select(0);
+                    lv_i18n_set_locale("zh-cn");
+                }
                 break;
 
             // chose rotation
@@ -200,6 +213,12 @@ static void _setting_init(void) {
         lv_obj_add_state(ui_SwitchKS, LV_STATE_CHECKED);
     else
         lv_obj_clear_state(ui_SwitchKS, LV_STATE_CHECKED);
+
+    // language
+    if(ui_get_language_select() == 1)
+        lv_obj_add_state(ui_SwitchLang, LV_STATE_CHECKED);
+    else
+        lv_obj_clear_state(ui_SwitchLang, LV_STATE_CHECKED);
 
     // lcd rotation
     uint16_t rotation = ui_get_display_rotation();
