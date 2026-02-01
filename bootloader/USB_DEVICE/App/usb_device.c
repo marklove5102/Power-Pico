@@ -55,6 +55,12 @@ USBD_HandleTypeDef hUsbDeviceFS;
  */
 /* USER CODE BEGIN 1 */
 
+void USER_USB_DEVICE_DeInit(void)
+{
+  USBD_Stop(&hUsbDeviceFS);
+  USBD_DeInit(&hUsbDeviceFS);
+}
+
 /* USER CODE END 1 */
 
 /**
