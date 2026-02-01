@@ -25,11 +25,20 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "common.h"
-#include "usart.h"
+#include "usbd_cdc_if.h"
+#include "usbd_core.h" // ??????????????
+#include "usb_device.h" // ?????? hUsbDeviceFS
+
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
+
+// ?? usbd_cdc_if.c ????
+extern uint8_t USB_RxBuffer[];
+extern volatile uint16_t USB_RxHead;
+extern volatile uint16_t USB_RxTail;
+
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
 
@@ -151,7 +160,7 @@ uint32_t Str2Int(uint8_t *inputstr, int32_t *intnum)
 }
 
 /**
-  * @brief  Get an integer from the HyperTerminal
+  * @brief  Get an integer from the USB VCP
   * @param  num: The integer
   * @retval 1: Correct
   *         0: Error
@@ -166,13 +175,13 @@ uint32_t GetIntegerInput(int32_t * num)
     if (inputstr[0] == '\0') continue;
     if ((inputstr[0] == 'a' || inputstr[0] == 'A') && inputstr[1] == '\0')
     {
-      SerialPutString("User Cancelled \r\n");
+      USB_PutString("User Cancelled \r\n");
       return 0;
     }
 
     if (Str2Int(inputstr, num) == 0)
     {
-      SerialPutString("Error, Input again: \r\n");
+      USB_PutString("Error, Input again: \r\n");
     }
     else
     {
@@ -182,17 +191,19 @@ uint32_t GetIntegerInput(int32_t * num)
 }
 
 /**
-  * @brief  Test to see if a key has been pressed on the HyperTerminal
+  * @brief  Test to see if a key has been pressed on the USB VCP
   * @param  key: The key pressed
-  * @retval 1: Correct
-  *         0: Error
+  * @retval 1: A key was received
+  *         0: No key was received
   */
-uint32_t SerialKeyPressed(uint8_t *key)
+uint32_t USB_KeyPressed(uint8_t *key)
 {
-  if (__HAL_UART_GET_FLAG(&huart6, UART_FLAG_RXNE) != RESET)
+  // Check if there is data in the USB receive ring buffer
+  if (USB_RxHead != USB_RxTail)
   {
-    *key = (uint16_t)((&huart6)->Instance->DR & (uint16_t)0x01FF);
-     return 1;
+    *key = USB_RxBuffer[USB_RxTail];
+    USB_RxTail = (USB_RxTail + 1) % 2048; // APP_RX_DATA_SIZE
+    return 1;
   }
   else
   {
@@ -200,9 +211,8 @@ uint32_t SerialKeyPressed(uint8_t *key)
   }
 }
 
-
 /**
-  * @brief  Get a key from the HyperTerminal
+  * @brief  Get a key from the USB VCP
   * @param  None
   * @retval The Key Pressed
   */
@@ -213,39 +223,66 @@ uint8_t GetKey(void)
   /* Waiting for user input */
   while (1)
   {
-    if (SerialKeyPressed((uint8_t*)&key)) break;
+    if (USB_KeyPressed((uint8_t*)&key)) break;
   }
   return key;
 
 }
 
 
-/**
-  * @brief  Print a character on the HyperTerminal
-  * @param  c: The character to be printed
-  * @retval None
-  */
-void SerialPutChar(uint8_t c)
+uint8_t USB_GetChar(uint8_t *c, uint32_t timeout)
 {
-  USART_SendData(USART6, c);
-  while (__HAL_UART_GET_FLAG(&huart6, UART_FLAG_TXE) == RESET)
-  {
-  }
+    uint32_t tickstart = HAL_GetTick();
+
+    while (1)
+    {
+        if (USB_RxHead != USB_RxTail)
+        {
+            *c = USB_RxBuffer[USB_RxTail];
+            USB_RxTail = (USB_RxTail + 1) % RING_BUFFER_SIZE;
+            return 0;
+        }
+
+        if ((HAL_GetTick() - tickstart) > timeout)
+        {
+            return 1;
+        }
+    }
 }
 
-
 /**
-  * @brief  Print a string on the HyperTerminal
-  * @param  s: The string to be printed
+  * @brief  Send a char to the USB VCP
+  * @param  c: The char to be sent
   * @retval None
   */
-void Serial_PutString(uint8_t *s)
+void USB_PutChar(uint8_t c)
 {
-  while (*s != '\0')
-  {
-    SerialPutChar(*s);
-    s++;
-  }
+    static uint8_t temp_buf;
+
+    if (hUsbDeviceFS.dev_state != USBD_STATE_CONFIGURED) return;
+
+    USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef*)hUsbDeviceFS.pClassData;
+    while (hcdc->TxState != 0) {}
+
+    temp_buf = c;
+    CDC_Transmit_FS(&temp_buf, 1);
+}
+
+void USB_PutString(char *s)
+{
+    if (hUsbDeviceFS.dev_state != USBD_STATE_CONFIGURED)
+    {
+        return;
+    }
+
+    uint32_t len = strlen(s);
+    while (CDC_Transmit_FS((uint8_t*)s, len) == USBD_BUSY)
+    {
+        if (hUsbDeviceFS.dev_state != USBD_STATE_CONFIGURED)
+        {
+            return;
+        }
+    }
 }
 
 /**
@@ -266,40 +303,27 @@ void GetInputString (uint8_t * buffP)
     {
       if (bytes_read > 0)
       {
-        SerialPutString("\b \b");
+        USB_PutString("\b \b");
         bytes_read --;
       }
       continue;
     }
     if (bytes_read >= CMD_STRING_SIZE )
     {
-      SerialPutString("Command string size overflow\r\n");
+      USB_PutString("Command string size overflow\r\n");
       bytes_read = 0;
       continue;
     }
     if (c >= 0x20 && c <= 0x7E)
     {
       buffP[bytes_read++] = c;
-      SerialPutChar(c);
+      USB_PutChar(c);
     }
   }
   while (1);
-  SerialPutString(("\n\r"));
+  USB_PutString(("\n\r"));
   buffP[bytes_read] = '\0';
 }
 
-//Ìí¼Ó´úÂë
-void USART_SendData(USART_TypeDef* USARTx, uint16_t Data)
-{
-  /* Check the parameters */
-  assert_param(IS_USART_ALL_PERIPH(USARTx));
-  assert_param(IS_USART_DATA(Data));
-
-  /* Transmit Data */
-  USARTx->DR = (Data & (uint16_t)0x01FF);
-}
-/**
-  * @}
-  */
 
 /*******************(C)COPYRIGHT 2011 STMicroelectronics *****END OF FILE******/

@@ -1,10 +1,10 @@
 /**
   ******************************************************************************
-  * @file    STM32F4xx_IAP/inc/ymodem.h 
+  * @file    STM32F4xx_IAP/inc/ymodem.h
   * @author  MCD Application Team
   * @version V1.0.0
   * @date    10-October-2011
-  * @brief   This file provides all the software function headers of the ymodem.c 
+  * @brief   This file provides all the software function headers of the ymodem.c
   *          file.
   ******************************************************************************
   * @attention

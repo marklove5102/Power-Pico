@@ -18,10 +18,11 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "crc.h"
 #include "i2c.h"
 #include "spi.h"
 #include "tim.h"
-#include "usart.h"
+#include "usb_device.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -75,17 +76,15 @@ void Bootloader_Main(void)
   while (1)
   {
       // 1. 发送握手信号
-      uint8_t status = 0xAA;
-      SerialPutChar(status);
-      Serial_PutString("##PICO_BOOT##\r\n");
+      USB_PutString("##PICO_BOOT##\r\n");
       // 2. 在延时期间(比如500ms)不断检查有没有收到数据
       // 这样既实现了延时，又不会阻塞接收
       uint8_t key = 0;
       for (int i = 0; i < 50; i++)
       {
-          // SerialKeyPressed 应该是一个非阻塞检查函数
+          // USB_KeyPressed 应该是一个非阻塞检查函数
           // 如果收到数据返回 1，否则返回 0
-          if (SerialKeyPressed(&key))
+          if (USB_KeyPressed(&key))
           {
               if (key == '0')
               {
@@ -130,8 +129,9 @@ int main(void)
   MX_GPIO_Init();
   MX_SPI2_Init();
   MX_TIM1_Init();
-  MX_USART6_UART_Init();
   MX_I2C1_Init();
+  MX_USB_DEVICE_Init();
+  MX_CRC_Init();
   /* USER CODE BEGIN 2 */
 
 	//sys delay
@@ -154,7 +154,7 @@ int main(void)
 	if(!EEPROM_Init_Check()) {
 		update_flag = EEPROM_UpdateCommand_Check();
 		if(EEPROM_UpdateCommand_Check()) {
-			Serial_PutString("enter firmware update mode\r\n");
+			USB_PutString("enter firmware update mode\r\n");
 			EEPROM_UpdateCommand_Write(false);
 		}
 	}
@@ -201,7 +201,7 @@ int main(void)
     if (strcmp(combined_str, "APP FLAG") == 0)
     {
         // 如果相同则跳转
-        Serial_PutString("APP FLAG OK, jump to app\r\n");
+        USB_PutString("APP FLAG OK, jump to app\r\n");
         //user code here
         SysTick->CTRL = 0X00;//禁止SysTick
         SysTick->LOAD = 0;
@@ -238,8 +238,6 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-		Serial_PutString("run in boot while(1)\r\n");
-    Serial_PutString("there is no legal APP\r\n");
 		HAL_Delay(500);
   }
   /* USER CODE END 3 */
@@ -262,13 +260,12 @@ void SystemClock_Config(void)
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
-  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
-  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
-  RCC_OscInitStruct.PLL.PLLM = 8;
-  RCC_OscInitStruct.PLL.PLLN = 100;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+  RCC_OscInitStruct.PLL.PLLM = 25;
+  RCC_OscInitStruct.PLL.PLLN = 192;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
   RCC_OscInitStruct.PLL.PLLQ = 4;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)

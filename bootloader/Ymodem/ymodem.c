@@ -1,10 +1,10 @@
 /**
   ******************************************************************************
-  * @file    STM32F4xx_IAP/src/ymodem.c 
+  * @file    STM32F4xx_IAP/src/ymodem.c
   * @author  MCD Application Team
   * @version V1.0.0
   * @date    10-October-2011
-  * @brief   This file provides all the software functions related to the ymodem 
+  * @brief   This file provides all the software functions related to the ymodem
   *          protocol.
   ******************************************************************************
   * @attention
@@ -20,10 +20,7 @@
   ******************************************************************************
   */
 
-/** @addtogroup STM32F4xx_IAP
-  * @{
-  */ 
-  
+
 /* Includes ------------------------------------------------------------------*/
 #include "flash_if.h"
 #include "common.h"
@@ -46,11 +43,11 @@ extern uint8_t FileName[];
   * @retval 0: Byte received
   *        -1: Timeout
   */
-static  int32_t Receive_Byte (uint8_t *c, uint32_t timeout)
+static int32_t Receive_Byte (uint8_t *c, uint32_t timeout)
 {
   while (timeout-- > 0)
   {
-    if (SerialKeyPressed(c) == 1)
+    if (USB_KeyPressed(c) == 1)
     {
       return 0;
     }
@@ -65,7 +62,7 @@ static  int32_t Receive_Byte (uint8_t *c, uint32_t timeout)
   */
 static uint32_t Send_Byte (uint8_t c)
 {
-  SerialPutChar(c);
+  USB_PutChar(c);
   return 0;
 }
 
@@ -289,12 +286,12 @@ void Ymodem_PrepareIntialPacket(uint8_t *data, const uint8_t* fileName, uint32_t
 {
   uint16_t i, j;
   uint8_t file_ptr[10];
-  
+
   /* Make first three packet */
   data[0] = SOH;
   data[1] = 0x00;
   data[2] = 0xff;
-  
+
   /* Filename packet has valid data */
   for (i = 0; (fileName[i] != '\0') && (i < FILE_NAME_LENGTH);i++)
   {
@@ -302,13 +299,13 @@ void Ymodem_PrepareIntialPacket(uint8_t *data, const uint8_t* fileName, uint32_t
   }
 
   data[i + PACKET_HEADER] = 0x00;
-  
+
   Int2Str (file_ptr, *length);
   for (j =0, i = i + PACKET_HEADER + 1; file_ptr[j] != '\0' ; )
   {
      data[i++] = file_ptr[j++];
   }
-  
+
   for (j = i; j < PACKET_SIZE + PACKET_HEADER; j++)
   {
     data[j] = 0;
@@ -325,7 +322,7 @@ void Ymodem_PreparePacket(uint8_t *SourceBuf, uint8_t *data, uint8_t pktNo, uint
 {
   uint16_t i, size, packetSize;
   uint8_t* file_ptr;
-  
+
   /* Make first three packet */
   packetSize = sizeBlk >= PACKET_1K_SIZE ? PACKET_1K_SIZE : PACKET_SIZE;
   size = sizeBlk < packetSize ? sizeBlk :packetSize;
@@ -340,7 +337,7 @@ void Ymodem_PreparePacket(uint8_t *SourceBuf, uint8_t *data, uint8_t pktNo, uint
   data[1] = pktNo;
   data[2] = (~pktNo);
   file_ptr = SourceBuf;
-  
+
   /* Filename packet has valid data */
   for (i = PACKET_HEADER; i < size + PACKET_HEADER;i++)
   {
@@ -357,7 +354,7 @@ void Ymodem_PreparePacket(uint8_t *SourceBuf, uint8_t *data, uint8_t pktNo, uint
 
 /**
   * @brief  Update CRC16 for input byte
-  * @param  CRC input value 
+  * @param  CRC input value
   * @param  input byte
   * @retval None
   */
@@ -375,7 +372,7 @@ uint16_t UpdateCRC16(uint16_t crcIn, uint8_t byte)
     if(crc & 0x10000)
       crc ^= 0x1021;
   }
-  
+
   while(!(in & 0x10000));
 
   return crc & 0xffffu;
@@ -395,7 +392,7 @@ uint16_t Cal_CRC16(const uint8_t* data, uint32_t size)
 
   while(data < dataEnd)
     crc = UpdateCRC16(crc, *data++);
- 
+
   crc = UpdateCRC16(crc, 0);
   crc = UpdateCRC16(crc, 0);
 
@@ -443,7 +440,7 @@ void Ymodem_SendPacket(uint8_t *data, uint16_t length)
   */
 uint8_t Ymodem_Transmit (uint8_t *buf, const uint8_t* sendFileName, uint32_t sizeFile)
 {
-  
+
   uint8_t packet_data[PACKET_1K_SIZE + PACKET_OVERHEAD];
   uint8_t filename[FILE_NAME_LENGTH];
   uint8_t *buf_ptr, tempCheckSum;
@@ -459,11 +456,11 @@ uint8_t Ymodem_Transmit (uint8_t *buf, const uint8_t* sendFileName, uint32_t siz
     filename[i] = sendFileName[i];
   }
   CRC16_F = 1;
-    
+
   /* Prepare first block */
   Ymodem_PrepareIntialPacket(&packet_data[0], filename, &sizeFile);
-  
-  do 
+
+  do
   {
     /* Send Packet */
     Ymodem_SendPacket(packet_data, PACKET_SIZE + PACKET_HEADER);
@@ -480,12 +477,12 @@ uint8_t Ymodem_Transmit (uint8_t *buf, const uint8_t* sendFileName, uint32_t siz
        tempCheckSum = CalChecksum (&packet_data[3], PACKET_SIZE);
        Send_Byte(tempCheckSum);
     }
-  
+
     /* Wait for Ack and 'C' */
-    if (Receive_Byte(&receivedC[0], 10000) == 0)  
+    if (Receive_Byte(&receivedC[0], 10000) == 0)
     {
       if (receivedC[0] == ACK)
-      { 
+      {
         /* Packet transferred correctly */
         ackReceived = 1;
       }
@@ -495,7 +492,7 @@ uint8_t Ymodem_Transmit (uint8_t *buf, const uint8_t* sendFileName, uint32_t siz
         errors++;
     }
   }while (!ackReceived && (errors < 0x0A));
-  
+
   if (errors >=  0x0A)
   {
     return errors;
@@ -504,8 +501,8 @@ uint8_t Ymodem_Transmit (uint8_t *buf, const uint8_t* sendFileName, uint32_t siz
   size = sizeFile;
   blkNumber = 0x01;
   /* Here 1024 bytes package is used to send the packets */
-  
-  
+
+
   /* Resend packet if NAK  for a count of 10 else end of communication */
   while (size)
   {
@@ -520,7 +517,7 @@ uint8_t Ymodem_Transmit (uint8_t *buf, const uint8_t* sendFileName, uint32_t siz
       if (size >= PACKET_1K_SIZE)
       {
         pktSize = PACKET_1K_SIZE;
-       
+
       }
       else
       {
@@ -540,14 +537,14 @@ uint8_t Ymodem_Transmit (uint8_t *buf, const uint8_t* sendFileName, uint32_t siz
         tempCheckSum = CalChecksum (&packet_data[3], pktSize);
         Send_Byte(tempCheckSum);
       }
-      
+
       /* Wait for Ack */
       if ((Receive_Byte(&receivedC[0], 100000) == 0)  && (receivedC[0] == ACK))
       {
-        ackReceived = 1;  
+        ackReceived = 1;
         if (size > pktSize)
         {
-           buf_ptr += pktSize;  
+           buf_ptr += pktSize;
            size -= pktSize;
            if (blkNumber == (USER_FLASH_SIZE/1024))
            {
@@ -570,36 +567,36 @@ uint8_t Ymodem_Transmit (uint8_t *buf, const uint8_t* sendFileName, uint32_t siz
       }
     }while(!ackReceived && (errors < 0x0A));
     /* Resend packet if NAK  for a count of 10 else end of communication */
-    
+
     if (errors >=  0x0A)
     {
       return errors;
     }
-    
+
   }
   ackReceived = 0;
   receivedC[0] = 0x00;
   errors = 0;
-  do 
+  do
   {
     Send_Byte(EOT);
     /* Send (EOT); */
     /* Wait for Ack */
     if ((Receive_Byte(&receivedC[0], 10000) == 0)  && receivedC[0] == ACK)
     {
-      ackReceived = 1;  
+      ackReceived = 1;
     }
     else
     {
       errors++;
     }
   }while (!ackReceived && (errors < 0x0A));
-    
+
   if (errors >=  0x0A)
   {
     return errors;
   }
-  
+
   /* Last packet preparation */
   ackReceived = 0;
   receivedC[0] = 0x00;
@@ -613,8 +610,8 @@ uint8_t Ymodem_Transmit (uint8_t *buf, const uint8_t* sendFileName, uint32_t siz
   {
      packet_data [i] = 0x00;
   }
-  
-  do 
+
+  do
   {
     /* Send Packet */
     Ymodem_SendPacket(packet_data, PACKET_SIZE + PACKET_HEADER);
@@ -623,12 +620,12 @@ uint8_t Ymodem_Transmit (uint8_t *buf, const uint8_t* sendFileName, uint32_t siz
     tempCRC = Cal_CRC16(&packet_data[3], PACKET_SIZE);
     Send_Byte(tempCRC >> 8);
     Send_Byte(tempCRC & 0xFF);
-  
+
     /* Wait for Ack and 'C' */
-    if (Receive_Byte(&receivedC[0], 10000) == 0)  
+    if (Receive_Byte(&receivedC[0], 10000) == 0)
     {
       if (receivedC[0] == ACK)
-      { 
+      {
         /* Packet transferred correctly */
         ackReceived = 1;
       }
@@ -643,16 +640,16 @@ uint8_t Ymodem_Transmit (uint8_t *buf, const uint8_t* sendFileName, uint32_t siz
   if (errors >=  0x0A)
   {
     return errors;
-  }  
-  
-  do 
+  }
+
+  do
   {
     Send_Byte(EOT);
     /* Send (EOT); */
     /* Wait for Ack */
     if ((Receive_Byte(&receivedC[0], 10000) == 0)  && receivedC[0] == ACK)
     {
-      ackReceived = 1;  
+      ackReceived = 1;
     }
     else
     {

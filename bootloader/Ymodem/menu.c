@@ -34,9 +34,17 @@
 #include "flash_if.h"
 #include "menu.h"
 #include "ymodem.h"
+#include "string.h"
+#include "usb_device.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
+
+// 定义升级状态
+#define UPGRADE_STATUS_NONE       0xFFFFFFFF
+#define UPGRADE_STATUS_START      0xABCD1234
+#define UPGRADE_STATUS_COMPLETE   0x5A5A5A5A
+
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 pFunction Jump_To_Application;
@@ -49,99 +57,127 @@ uint8_t tab_1024[1024] =
 uint8_t FileName[FILE_NAME_LENGTH];
 
 /* Private function prototypes -----------------------------------------------*/
-void SerialDownload(void);
-void SerialUpload(void);
+void USB_Download(void);
 
 /* Private functions ---------------------------------------------------------*/
+
+/**
+  * @brief  Writes the UpgradeInfo structure to the dedicated Flash sector.
+  * @param  info: pointer to the UpgradeInfo_t structure
+  * @retval None
+  */
+static void Write_Upgrade_Info(UpgradeInfo_t* info)
+{
+    // 假设校验区在最后一个扇区 (Sector 7 for 512KB device)
+    // 注意：擦除会擦除整个扇区，如果扇区很大，需要先备份再写入
+    // 为简化，我们直接擦除并写入
+    FLASH_If_Erase_One_Sector(7);
+
+    uint32_t flash_address = UPGRADE_INFO_ADDRESS;
+    FLASH_If_Write((__IO uint32_t*)&flash_address, (uint32_t*)info, sizeof(UpgradeInfo_t) / 4);
+}
+
+/**
+  * @brief  Reads the UpgradeInfo structure from the dedicated Flash sector.
+  * @param  info: pointer to the UpgradeInfo_t structure to be filled
+  * @retval None
+  */
+static void Read_Upgrade_Info(UpgradeInfo_t* info)
+{
+    memcpy(info, (void*)UPGRADE_INFO_ADDRESS, sizeof(UpgradeInfo_t));
+}
+
+/**
+  * @brief  Calculates the CRC32 of a given memory area.
+  * @param  start_address: Start address of the data
+  * @param  size: Size of the data in bytes
+  * @retval Calculated CRC32 value
+  */
+static uint32_t Calculate_CRC32(uint32_t start_address, uint32_t size)
+{
+    // 启用CRC外设时钟
+    __HAL_RCC_CRC_CLK_ENABLE();
+    CRC_HandleTypeDef CrcHandle;
+    CrcHandle.Instance = CRC;
+    HAL_CRC_Init(&CrcHandle);
+
+    return HAL_CRC_Calculate(&CrcHandle, (uint32_t*)start_address, size / 4);
+}
 
 /**
   * @brief  Download a file via serial port
   * @param  None
   * @retval None
   */
-void SerialDownload(void)
+void USB_Download(void)
 {
+  UpgradeInfo_t received_info;
   uint8_t Number[10] = "          ";
-  int32_t Size = 0;
+  int32_t file_size = 0;
 
   // user operation
-  // clear the flag in flash in 0x08008000
-  uint32_t flashdestination = ADDR_FLASH_SECTOR_2;
-  // sector 2
-  FLASH_If_Erase_One_Sector(2U);
-
+  // 1. 接收元数据
+  USB_PutString("Waiting for the file to be sent ... (press 'a' to abort)\n\r");
+  // 2. 擦除整个APP区域
+  USB_PutString("Erasing Application Area...\r\n");
+  if (FLASH_If_Erase(APPLICATION_ADDRESS) != 0)
+  {
+      USB_PutString("Error: Failed to erase application area!\r\n");
+      return;
+  }
+  USB_PutString("Erase Complete.\r\n");
   /* Waiting for file sent */
-  SerialPutString("Waiting for the file to be sent ... (press 'a' to abort)\n\r");
-  Size = Ymodem_Receive(&tab_1024[0]);
-  if (Size > 0)
+  USB_PutString("Starting Ymodem Receive\n\r");
+  file_size = Ymodem_Receive(&tab_1024[0]);
+  if (file_size > 0)
   {
-    SerialPutString("\n\n\r Programming Completed Successfully!\n\r--------------------------------\r\n Name: ");
-    SerialPutString(FileName);
-    Int2Str(Number, Size);
-    SerialPutString("\n\r Size: ");
-    SerialPutString(Number);
-    SerialPutString(" Bytes\r\n");
-    SerialPutString("-------------------\n");
 
-    // user operation
-    // set the flag in flash in 0x08008000
-    const char *str_flag = "APP FLAG";
-    uint32_t * APP_FLAG = (uint32_t *)str_flag;
+    USB_PutString("\n\n\r File reception complete. Verifying...\n\r");
+    // 4. 最终校验
+    // 理想情况下，这里应该有一个从上位机获取的CRC32值进行对比
+    // 作为演示，我们只计算并保存
+    uint32_t calculated_crc = Calculate_CRC32(APPLICATION_ADDRESS, file_size);
 
-    /* Write received data in Flash */
-    if (FLASH_If_Write(&flashdestination, (uint32_t*) APP_FLAG, 2)  == 0)
+    // 5. 写入校验信息到Flash末尾
+    received_info.magic_word = 0xDEADBEEF;
+    received_info.upgrade_status = UPGRADE_STATUS_COMPLETE; // 标记为升级完成
+    received_info.new_app_size = file_size;
+    received_info.new_app_crc32 = calculated_crc;
+    Write_Upgrade_Info(&received_info);
+    USB_PutString("Verification and Flag Set successful!\r\n");
+    USB_PutString("--------------------------------\r\n Name: ");
+    USB_PutString(FileName);
+    Int2Str(Number, file_size);
+    USB_PutString("\n\r Size: ");
+    USB_PutString(Number);
+    USB_PutString(" Bytes\r\n");
+    USB_PutString(" CRC32: 0x");
+    // 打印CRC值 (需要实现一个Int-to-Hex函数)
+    USB_PutString("\r\n-------------------\n");
+    USB_PutString("Please reboot the device.\r\n");
+  }
+  else /* An error occurred while writing to Flash memory */
+  {
+    // 升级失败，清除标志区，强制下次进入Bootloader
+    FLASH_If_Erase_One_Sector(7); // 假设校验区在最后一个扇区
+    USB_PutString("\n\rUpgrade failed!\r\n");
+    if (file_size == -1)
     {
-      SerialPutString("\n\n\r APP Flag Set Successfully!\n\r--------------------------------\r\n");
+      USB_PutString("\n\n\rThe image size is higher than the allowed space memory!\n\r");
     }
-    else /* An error occurred while writing to Flash memory */
+    else if (file_size == -2)
     {
-      /* End session */
-      SerialPutString("\n\n\r APP Flag Set Error!\n\r--------------------------------\r\n");
+      USB_PutString("\n\n\rVerification failed!\n\r");
     }
-
-  }
-  else if (Size == -1)
-  {
-    SerialPutString("\n\n\rThe image size is higher than the allowed space memory!\n\r");
-  }
-  else if (Size == -2)
-  {
-    SerialPutString("\n\n\rVerification failed!\n\r");
-  }
-  else if (Size == -3)
-  {
-    SerialPutString("\r\n\nAborted by user.\n\r");
-  }
-  else
-  {
-    SerialPutString("\n\rFailed to receive the file!\n\r");
-  }
-}
-
-/**
-  * @brief  Upload a file via serial port.
-  * @param  None
-  * @retval None
-  */
-void SerialUpload(void)
-{
-  uint8_t status = 0 ;
-
-  SerialPutString("\n\n\rSelect Receive File\n\r");
-
-  if (GetKey() == CRC16)
-  {
-    /* Transmit the flash image through ymodem protocol */
-    status = Ymodem_Transmit((uint8_t*)APPLICATION_ADDRESS, (const uint8_t*)"UploadedFlashImage.bin", USER_FLASH_SIZE);
-
-    if (status != 0)
+    else if (file_size == -3)
     {
-      SerialPutString("\n\rError Occurred while Transmitting File\n\r");
+      USB_PutString("\r\n\nAborted by user.\n\r");
     }
     else
     {
-      SerialPutString("\n\rFile uploaded successfully \n\r");
+      USB_PutString("\n\rFailed to receive the file!\n\r");
     }
+
   }
 }
 
@@ -154,14 +190,14 @@ void Main_Menu(void)
 {
   uint8_t key = 0;
 
-  SerialPutString("\r\n======================================================================");
-  SerialPutString("\r\n=              (C) COPYRIGHT 2011 STMicroelectronics                 =");
-  SerialPutString("\r\n=                                                                    =");
-  SerialPutString("\r\n=  STM32F4xx In-Application Programming Application  (Version 1.0.0) =");
-  SerialPutString("\r\n=                                                                    =");
-  SerialPutString("\r\n=                                   By MCD Application Team          =");
-  SerialPutString("\r\n======================================================================");
-  SerialPutString("\r\n\r\n");
+  USB_PutString("\r\n======================================================================");
+  USB_PutString("\r\n=              (C) COPYRIGHT 2011 STMicroelectronics                 =");
+  USB_PutString("\r\n=                                                                    =");
+  USB_PutString("\r\n=  STM32F4xx In-Application Programming Application  (Version 1.0.0) =");
+  USB_PutString("\r\n=                                                                    =");
+  USB_PutString("\r\n=                                   By MCD Application Team          =");
+  USB_PutString("\r\n======================================================================");
+  USB_PutString("\r\n\r\n");
 
   /* Test if any sector of Flash memory where user application will be loaded is write protected */
   if (FLASH_If_GetWriteProtectionStatus() == 0)
@@ -175,17 +211,17 @@ void Main_Menu(void)
 
   while (1)
   {
-    SerialPutString("\r\n================== Main Menu ============================\r\n\n");
-    SerialPutString("  Download Image To the STM32F4xx Internal Flash ------- 1\r\n\n");
-    SerialPutString("  Upload Image From the STM32F4xx Internal Flash ------- 2\r\n\n");
-    SerialPutString("  Execute The New Program ------------------------------ 3\r\n\n");
+    USB_PutString("\r\n================== Main Menu ============================\r\n\n");
+    USB_PutString("  Download Image To the STM32F4xx Internal Flash ------- 1\r\n\n");
+    USB_PutString("  Upload Image From the STM32F4xx Internal Flash ------- 2\r\n\n");
+    USB_PutString("  Execute The New Program ------------------------------ 3\r\n\n");
 
     if(FlashProtection != 0)
     {
-      SerialPutString("  Disable the write protection ------------------------- 4\r\n\n");
+      USB_PutString("  Disable the write protection ------------------------- 4\r\n\n");
     }
 
-    SerialPutString("==========================================================\r\n\n");
+    USB_PutString("==========================================================\r\n\n");
 
     /* Receive key */
     key = GetKey();
@@ -193,16 +229,17 @@ void Main_Menu(void)
     if (key == 0x31)
     {
       /* Download user application in the Flash */
-      SerialDownload();
+      USB_Download();
     }
     else if (key == 0x32)
     {
       /* Upload user application from the Flash */
-      // SerialUpload();
-      SerialPutString("This function is disabled! Please Use 1\r");
+      // USB_Upload();
+      USB_PutString("This function is disabled! Please Use 1\r");
     }
     else if (key == 0x33) /* execute the new program */
     {
+      USBD_DeInit(&hUsbDeviceFS);
       //user code here
       SysTick->CTRL = 0X00;//禁止SysTick
       SysTick->LOAD = 0;
@@ -224,13 +261,13 @@ void Main_Menu(void)
       {
         case 1:
         {
-          SerialPutString("Write Protection disabled...\r\n");
+          USB_PutString("Write Protection disabled...\r\n");
           FlashProtection = 0;
           break;
         }
         case 2:
         {
-          SerialPutString("Error: Flash write unprotection failed...\r\n");
+          USB_PutString("Error: Flash write unprotection failed...\r\n");
           break;
         }
         default:
@@ -242,11 +279,11 @@ void Main_Menu(void)
     {
       if (FlashProtection == 0)
       {
-        SerialPutString("Invalid Number ! ==> The number should be either 1, 2 or 3\r");
+        USB_PutString("Invalid Number ! ==> The number should be either 1, 2 or 3\r");
       }
       else
       {
-        SerialPutString("Invalid Number ! ==> The number should be either 1, 2, 3 or 4\r");
+        USB_PutString("Invalid Number ! ==> The number should be either 1, 2, 3 or 4\r");
       }
     }
   }
