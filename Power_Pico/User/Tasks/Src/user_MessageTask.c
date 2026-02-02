@@ -30,7 +30,7 @@ void MessageTask(void *argument)
       // check the received message is "update\r\n" ?
       if(strcmp((const char *)uart_receive_buf, "update\r\n") == 0) {
         // send response
-        printf("start update\r\n");
+        UART6_TX_Send((uint8_t *)"start update\r\n", 14);
         EEPROM_UpdateCommand_Write(true);
         HAL_Delay(100);
         // reset
