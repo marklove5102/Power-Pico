@@ -70,7 +70,7 @@ typedef struct {
     uint8_t  data_count;     // 固定 100
 
     struct {
-        uint8_t  range;      // 量程: 0=Low, 1=Mid, 2=High
+        uint8_t  range;      // 量程: 1=Low, 2=Mid, 3=High
         uint16_t vol_adc;    // 电压
         uint16_t cur_adc;    // 电流 (选择后)
         uint16_t ref_adc;    // 参考电压
