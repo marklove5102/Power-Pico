@@ -52,6 +52,13 @@ void USER_USB_DEVICE_DeInit(void)
 {
   USBD_Stop(&hUsbDeviceFS);
   USBD_DeInit(&hUsbDeviceFS);
+  __HAL_RCC_USB_OTG_FS_FORCE_RESET();
+  HAL_Delay(10);
+  __HAL_RCC_USB_OTG_FS_RELEASE_RESET();
+  __HAL_RCC_USB_OTG_FS_CLK_DISABLE();
+  HAL_PCD_MspDeInit(hUsbDeviceFS.pData);
+  // 手动配置USB引脚为GPIO输出，强制拉低DP线以模拟拔出
+  USER_USBD_LL_Simulate_Disconnect();
 }
 
 /* USER CODE END 0 */

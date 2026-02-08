@@ -30,6 +30,9 @@ void MessageTask(void *argument)
       // set the EEPROM flag
       EEPROM_UpdateCommand_Write(true);
       HAL_Delay(100);
+      USER_USB_DEVICE_DeInit();
+      // 给予PC足够的时间来识别设备断开
+      HAL_Delay(500);
       // reset
       NVIC_SystemReset();
     }

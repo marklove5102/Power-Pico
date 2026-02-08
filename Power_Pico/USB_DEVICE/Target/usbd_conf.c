@@ -59,6 +59,28 @@ USBD_StatusTypeDef USBD_Get_USB_Status(HAL_StatusTypeDef hal_status);
 
 /* USER CODE BEGIN 1 */
 
+/**
+  * @brief  Manually simulates a USB device disconnection by pulling D+ low.
+  * @retval None
+  */
+void USER_USBD_LL_Simulate_Disconnect(void)
+{
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+  // 1. 确保 GPIOA 时钟已使能
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+
+  // 2. 将 PA12 (USB_DP) 配置为推挽输出
+  GPIO_InitStruct.Pin = GPIO_PIN_12;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  // 3. 强制将 PA12 输出低电平，拉低 D+
+  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
+}
+
 /* USER CODE END 1 */
 
 /*******************************************************************************
