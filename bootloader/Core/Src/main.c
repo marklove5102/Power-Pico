@@ -191,21 +191,7 @@ int main(void)
         {
             // 4. 校验成功，执行跳转
             USB_PutString("Valid APP found, jumping to application...\r\n");
-            // 获取APP的堆栈指针和跳转地址
-            uint32_t JumpAddress = *(__IO uint32_t*) (APPLICATION_ADDRESS + 4);
-            Jump_To_Application = (pFunction) JumpAddress;
-            // 在跳转前反初始化所有Bootloader用过的外设
-            USER_USB_DEVICE_DeInit();
-            HAL_RCC_DeInit();
-            HAL_DeInit();
-            SysTick->CTRL = 0;
-            SysTick->LOAD = 0;
-            SysTick->VAL = 0;
-            __disable_irq();
-
-            // 设置APP的堆栈指针并跳转
-            __set_MSP(*(__IO uint32_t*) APPLICATION_ADDRESS);
-            Jump_To_Application();
+            jump_to_app();
         }
     }
 		// no legal APP

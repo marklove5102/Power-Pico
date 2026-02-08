@@ -229,22 +229,7 @@ void Main_Menu(void)
     {
       USB_PutString("Start to execute the user application...\r\n");
       HAL_Delay(1000);
-      USER_USB_DEVICE_DeInit();
-      HAL_RCC_DeInit();
-      HAL_DeInit();
-      //user code here
-      SysTick->CTRL = 0X00;//禁止SysTick
-      SysTick->LOAD = 0;
-      SysTick->VAL = 0;
-      __disable_irq();
-
-      //set JumpAddress
-      JumpAddress = *(__IO uint32_t*) (APPLICATION_ADDRESS + 4);
-      /* Jump to user application */
-      Jump_To_Application = (pFunction) JumpAddress;
-      /* Initialize user application's Stack Pointer */
-      __set_MSP(*(__IO uint32_t*) APPLICATION_ADDRESS);
-      Jump_To_Application();
+      jump_to_app();
     }
     else if ((key == 0x34) && (FlashProtection == 1))
     {
@@ -279,6 +264,37 @@ void Main_Menu(void)
       }
     }
   }
+}
+
+/* Public functions ---------------------------------------------------------*/
+
+/**
+  * @brief  Jumps to the user application loaded in the Flash memory.
+  * @param  None
+  * @retval None
+  */
+void jump_to_app(void)
+{
+    USER_USB_DEVICE_DeInit();
+    // 手动配置USB引脚为GPIO输出，强制拉低DP线以模拟拔出
+    USER_USBD_LL_Simulate_Disconnect();
+    // 给予PC足够的时间来识别设备断开
+    HAL_Delay(1000);
+    HAL_RCC_DeInit();
+    HAL_DeInit();
+    //user code here
+    SysTick->CTRL = 0X00;//禁止SysTick
+    SysTick->LOAD = 0;
+    SysTick->VAL = 0;
+    __disable_irq();
+
+    //set JumpAddress
+    JumpAddress = *(__IO uint32_t*) (APPLICATION_ADDRESS + 4);
+    /* Jump to user application */
+    Jump_To_Application = (pFunction) JumpAddress;
+    /* Initialize user application's Stack Pointer */
+    __set_MSP(*(__IO uint32_t*) APPLICATION_ADDRESS);
+    Jump_To_Application();
 }
 
 /**

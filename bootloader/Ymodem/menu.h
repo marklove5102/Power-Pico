@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @file    STM32F4xx_IAP/inc/menu.h 
+  * @file    STM32F4xx_IAP/inc/menu.h
   * @author  MCD Application Team
   * @version V1.0.0
   * @date    10-October-2011
@@ -17,7 +17,7 @@
   *
   * <h2><center>&copy; COPYRIGHT 2011 STMicroelectronics</center></h2>
   ******************************************************************************
-  */ 
+  */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __MENU_H
@@ -34,6 +34,7 @@ typedef  void (*pFunction)(void);
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
 void Main_Menu(void);
+void jump_to_app(void);
 
 #endif  /* __MENU_H */
 
