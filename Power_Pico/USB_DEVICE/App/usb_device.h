@@ -82,6 +82,8 @@ void MX_USB_DEVICE_Init(void);
  */
 /* USER CODE BEGIN FD */
 
+void USER_USB_DEVICE_DeInit(void);
+
 /* USER CODE END FD */
 /**
   * @}
