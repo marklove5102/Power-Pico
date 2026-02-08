@@ -30,29 +30,29 @@ void ui_main_page_key_handler(void* key_event)
     {
         lv_lib_pm_next();
     }
-    else if (((key_event_t*)key_event)->id == KEY_ID_L && ((key_event_t*)key_event)->type == KEY_EVT_CLICK)
-    {
-        // rotation - 90 degrees
-        // rotation – LV_DISPLAY_ROTATION_0/90/180/270
-        uint16_t rotation = ui_get_display_rotation();
-        rotation = (rotation + 360 - 90) % 360;
-        // set rotation value
-        ui_set_display_rotation(rotation);
-        // save settings to eeprom
-        ui_system_settings_save();
-        ui_full_screen_refresh(ui_HomeScreen);
-    }
-    else if (((key_event_t*)key_event)->id == KEY_ID_R && ((key_event_t*)key_event)->type == KEY_EVT_CLICK)
-    {
-        // rotation + 90 degrees
-        uint16_t rotation = ui_get_display_rotation();
-        rotation = (rotation + 360 + 90) % 360;
-        // set rotation value
-        ui_set_display_rotation(rotation);
-        // save settings to eeprom
-        ui_system_settings_save();
-        ui_full_screen_refresh(ui_HomeScreen);
-    }
+    // else if (((key_event_t*)key_event)->id == KEY_ID_L && ((key_event_t*)key_event)->type == KEY_EVT_CLICK)
+    // {
+    //     // rotation - 90 degrees
+    //     // rotation – LV_DISPLAY_ROTATION_0/90/180/270
+    //     uint16_t rotation = ui_get_display_rotation();
+    //     rotation = (rotation + 360 - 90) % 360;
+    //     // set rotation value
+    //     ui_set_display_rotation(rotation);
+    //     // save settings to eeprom
+    //     ui_system_settings_save();
+    //     ui_full_screen_refresh(ui_HomeScreen);
+    // }
+    // else if (((key_event_t*)key_event)->id == KEY_ID_R && ((key_event_t*)key_event)->type == KEY_EVT_CLICK)
+    // {
+    //     // rotation + 90 degrees
+    //     uint16_t rotation = ui_get_display_rotation();
+    //     rotation = (rotation + 360 + 90) % 360;
+    //     // set rotation value
+    //     ui_set_display_rotation(rotation);
+    //     // save settings to eeprom
+    //     ui_system_settings_save();
+    //     ui_full_screen_refresh(ui_HomeScreen);
+    // }
 }
 
 static void fmt_sig4(char *buf, size_t size, float v)
