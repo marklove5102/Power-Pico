@@ -36,6 +36,8 @@
 
 /* USER CODE BEGIN INCLUDE */
 
+void USER_USBD_LL_Simulate_Disconnect(void);
+
 /* USER CODE END INCLUDE */
 
 /** @addtogroup USBD_OTG_DRIVER
