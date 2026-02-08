@@ -276,10 +276,8 @@ void Main_Menu(void)
 void jump_to_app(void)
 {
     USER_USB_DEVICE_DeInit();
-    // 手动配置USB引脚为GPIO输出，强制拉低DP线以模拟拔出
-    USER_USBD_LL_Simulate_Disconnect();
     // 给予PC足够的时间来识别设备断开
-    HAL_Delay(1000);
+    HAL_Delay(500);
     HAL_RCC_DeInit();
     HAL_DeInit();
     //user code here
