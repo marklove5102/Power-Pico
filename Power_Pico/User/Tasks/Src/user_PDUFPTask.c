@@ -25,7 +25,7 @@ static void _timer_callback(void *argument)
         osMessageQueuePut(PD_handle_event_MsgQueue, &ready, 0, 1);
         time_count = 0;
         osTimerStop(PD_UFP_Task_timer_id);
-    } else if(time_count >= 10) { // 10秒超时
+    } else if(time_count >= 5) { // 5秒超时
         ready = PD_EVT_PPS_FAILED;
         osMessageQueuePut(PD_handle_event_MsgQueue, &ready, 0, 1);
         time_count = 0;
@@ -57,7 +57,7 @@ void PDUFPTask(void *argument)
         PD_protocol_init(&app_pd.protocol);
         PD_protocol_set_power_option(&app_pd.protocol, PD_POWER_OPTION_MAX_5V);
         PD_protocol_set_PPS(&app_pd.protocol, PPS_V(5.0), PPS_A(1.0), false); // 初始PPS 5V 1A
-        send_power_request();
+        // send_power_request();
         if(osTimerIsRunning(PD_UFP_Task_timer_id)) {
             osTimerStop(PD_UFP_Task_timer_id);
         }
