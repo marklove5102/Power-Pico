@@ -240,9 +240,16 @@ static void Data_Monitor_Update(uint16_t vol_adc, uint16_t cur_adc, uint16_t ref
             break;
     }
 
-    // 3. 累加数据 (此函数在中断上下文中被调用，Data_Monitor_Get_Values会处理中断保护)
+    // 3. 计算电压引入的误差电流 (单位: 10nA)
+    float error_current_10na = voltage_mv / 11.0f;
+
+    // 4. 计算最终校正后的电流
+    // 注意：误差电流是正的，所以要从测量值中减去
+    float final_current_10na = current_10na - error_current_10na;
+
+    // 5. 累加数据 (此函数在中断上下文中被调用，Data_Monitor_Get_Values会处理中断保护)
     g_data_monitor.sum_vol_mv += (uint64_t)voltage_mv;
-    g_data_monitor.sum_cur_resolution_10na += current_10na;
+    g_data_monitor.sum_cur_resolution_10na += final_current_10na;
     g_data_monitor.count++;
 }
 
