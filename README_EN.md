@@ -12,7 +12,7 @@
   <img src="https://img.shields.io/badge/UI-LVGL_v9.2-red">
   <img src="https://img.shields.io/badge/OS-FreeRTOS-green">
   <br>
-  <img src="https://img.shields.io/github/stars/kingham/Power-Pico?style=flat-square">
+  <img src="https://img.shields.io/github/stars/No-Chicken/Power-Pico.svg">
 </div>
 
 ---
@@ -21,9 +21,10 @@
 
 **Power-Pico** is more than just a USB ammeter. It is a **high-precision, low-power analysis tool** designed specifically for embedded developers. To overcome the physical limitations of traditional ammeters in the μA-level measurement, Power-Pico adopts an innovative **multi-range auto-switching sampling** design, achieving full-range coverage from $1\mu A$ to $5A$.
 
-<div style="margin-top:20px;text-align:center">
-    <img src="./images/main2316.png" style="width:75%;border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,0.1);display:inline-block" alt="Display" />
-</div>
+
+<p align="center">
+    <img border="1px" width="75%" src="./images/main2316.png">
+</p>
 
 ### ✨ Core Features
 - **μA-Level High Precision**: Utilizes the INA190 zero-drift amplifier with three-resistor segmented sampling.
@@ -64,16 +65,11 @@ The physical assembly is shown in the figure below:
 
 The exploded 3D view is as follows:
 
-<div style="display:flex;gap:15px;justify-content:center;align-items:center;margin-bottom:20px">
-
-<div style="flex:1;display:flex;align-items:center;justify-content:center;border-radius:12px;overflow:hidden;">
-    <img src="./images/boom.png" style="max-width:100%;max-height:100%;width:auto;height:auto;display:block" alt="3D Exploded View Left" />
-</div>
-
-<div style="flex:1;display:flex;align-items:center;justify-content:center;border-radius:12px;overflow:hidden;">
-    <img src="./images/boom.gif" style="max-width:100%;max-height:100%;width:auto;height:auto;display:block" alt="3D Exploded View Right" />
-</div>
-</div>
+<p align="center">
+    <img width="45%" src="./images/boom.png">
+    &nbsp;
+    <img width="45%" src="./images/boom.gif">
+</p>
 
 ### 4. Running the PC Client
 Install and use the PowerPico Client. Currently, it only supports Windows.
@@ -86,37 +82,21 @@ Install and use the PowerPico Client. Currently, it only supports Windows.
 
     The Power-Pico hardware currently supports 2 languages: **Simplified Chinese/English**.
 
-    <div style="display:flex;gap:15px;justify-content:center;align-items:center;margin-bottom:20px">
-
-    <div style="flex:1;display:flex;align-items:center;justify-content:center;border-radius:12px;overflow:hidden;">
-        <img src="./images/key_func.png" style="max-width:100%;max-height:100%;width:auto;height:auto;display:block" alt="Button Functions" />
-    </div>
-
-    <div style="flex:1;display:flex;align-items:center;justify-content:center;border-radius:12px;overflow:hidden;">
-        <img src="./images/startup_page.png" style="max-width:100%;max-height:100%;width:auto;height:auto;display:block" alt="Startup Page" />
-    </div>
-
-    <div style="flex:1;display:flex;align-items:center;justify-content:center;border-radius:12px;overflow:hidden;">
-        <img src="./images/main_page.png" style="max-width:100%;max-height:100%;width:auto;height:auto;display:block" alt="Main Page" />
-    </div>
-
-    </div>
-
-    <div style="display:flex;gap:15px;justify-content:center;align-items:center;margin-bottom:20px">
-
-    <div style="flex:1;display:flex;align-items:center;justify-content:center;border-radius:12px;overflow:hidden;">
-        <img src="./images/set_page.png" style="max-width:100%;max-height:100%;width:auto;height:auto;display:block" alt="Settings Page" />
-    </div>
-
-    <div style="flex:1;display:flex;align-items:center;justify-content:center;border-radius:12px;overflow:hidden;">
-        <img src="./images/pps_page1.png" style="max-width:100%;max-height:100%;width:auto;height:auto;display:block" alt="PPS Page 1" />
-    </div>
-
-    <div style="flex:1;display:flex;align-items:center;justify-content:center;border-radius:12px;overflow:hidden;">
-        <img src="./images/pps_page2.png" style="max-width:100%;max-height:100%;width:auto;height:auto;display:block" alt="PPS Page 2" />
-    </div>
-
-    </div>
+    <p align="center">
+        <img width="45%" src="./images/key_func.png">
+        &nbsp;
+        <img width="45%" src="./images/startup_page.png">
+    </p>
+    <p align="center">
+        <img width="45%" src="./images/main_page.png">
+        &nbsp;
+        <img width="45%" src="./images/set_page.png">
+    </p>
+    <p align="center">
+        <img width="45%" src="./images/pps_page1.png">
+        &nbsp;
+        <img width="45%" src="./images/pps_page2.png">
+    </p>
 
 2. Client Operation
 
@@ -124,27 +104,16 @@ Install and use the PowerPico Client. Currently, it only supports Windows.
 
     For detailed instructions on using the PowerPico Client, please refer to: [Client Operation Manual](https://no-chicken.com/content/Power-Pico/UserManual/client_operation.html)
 
-    <div style="display:flex;gap:15px;justify-content:center;align-items:center;margin-bottom:20px">
-
-    <div style="flex:1;display:flex;align-items:center;justify-content:center;border-radius:12px;overflow:hidden;">
-        <img src="./images/wave_client1.png" style="max-width:100%;max-height:100%;width:auto;height:auto;display:block" alt="Waveform Interface" />
-    </div>
-
-    <div style="flex:1;display:flex;align-items:center;justify-content:center;border-radius:12px;overflow:hidden;">
-        <img src="./images/firmware_client.png" style="max-width:100%;max-height:100%;width:auto;height:auto;display:block" alt="Firmware Upgrade Interface" />
-    </div>
-    </div>
-    <div style="display:flex;gap:15px;justify-content:center;align-items:center;margin-bottom:20px">
-
-    <div style="flex:1;display:flex;align-items:center;justify-content:center;border-radius:12px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.1);background:rgba(255,255,255,0.3);min-height:200px">
-        <img src="./images/wave_client2.png" style="max-width:100%;max-height:100%;width:auto;height:auto;display:block" alt="Waveform Interface 2" />
-    </div>
-
-    <div style="flex:1;display:flex;align-items:center;justify-content:center;border-radius:12px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.1);background:rgba(255,255,255,0.3);min-height:200px">
-        <img src="./images/set_client.png" style="max-width:100%;max-height:100%;width:auto;height:auto;display:block" alt="Settings Interface" />
-    </div>
-
-    </div>
+    <p align="center">
+        <img width="45%" src="./images/wave_client1.png">
+        &nbsp;
+        <img width="45%" src="./images/firmware_client.png">
+    </p>
+    <p align="center">
+        <img width="45%" src="./images/wave_client2.png">
+        &nbsp;
+        <img width="45%" src="./images/set_client.png">
+    </p>
 
 ## 📂 Project Structure
 ```text
@@ -164,14 +133,16 @@ Similar to previous projects, it uses a BootLoader + App structure for easy USB 
 <li>The 16kB area of the 3rd sector is the upgrade information area, used for verifying the integrity of the App on startup. For specific verification details, see the BootLoader code.</li>
 <li>The area starting from the 4th sector at 0x08010000 is the App area (A/B partitioning is not used due to insufficient on-chip Flash).</li>
 </ul>
-<div style="margin-top:20px;text-align:center">
-    <img src="./images/flash.png" style="width:75%;border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,0.1);display:inline-block" alt="Flash Partitioning" />
-</div>
+
+<p align="center">
+    <img width="75%" src="./images/flash.png">
+</p>
 
 High-speed data transmission is performed via USB. The data packet structure is shown below. Each packet contains 100 data sets, totaling 711 bytes including the header.
-<div style="margin-top:20px;text-align:center">
-    <img src="./images/protocol.png" style="width:100%;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.1);display:inline-block" alt="Data Packet Structure" />
-</div>
+
+<p align="center">
+    <img width="75%" src="./images/protocol.png">
+</p>
 
 📖 References
 

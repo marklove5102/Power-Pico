@@ -12,7 +12,7 @@
   <img src="https://img.shields.io/badge/UI-LVGL_v9.2-red">
   <img src="https://img.shields.io/badge/OS-FreeRTOS-green">
   <br>
-  <img src="https://img.shields.io/github/stars/kingham/Power-Pico?style=flat-square">
+  <img src="https://img.shields.io/github/stars/No-Chicken/Power-Pico.svg">
 </div>
 
 ---
@@ -21,9 +21,9 @@
 
 **Power-Pico** 不仅仅是一个 USB 电流表。它是专为嵌入式开发者设计的**高精度低功耗分析工具**。针对传统电流表在 $\mu A$ 级别测量时的物理局限性，Power-Pico 采用了创新的**多档位自动切换采样**设计，实现了从 $1\mu A$ 到 $5A$ 的全量程覆盖。
 
-<div style="margin-top:20px;text-align:center">
-    <img src="./images/main2316.png" style="width:75%;border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,0.1);display:inline-block" alt="展示图" />
-</div>
+<p align="center">
+	<img border="1px" width="75%" src="./images/main2316.png">
+</p>
 
 ### ✨ 核心特性
 - **uA 级高精度**：采用 INA190 零漂移放大器，配合三档电阻分段采样。
@@ -64,16 +64,11 @@
 
 3D爆炸图如下图所示:
 
-<div style="display:flex;gap:15px;justify-content:center;align-items:center;margin-bottom:20px">
-
-<div style="flex:1;display:flex;align-items:center;justify-content:center;border-radius:12px;overflow:hidden;">
-    <img src="./images/boom.png" style="max-width:100%;max-height:100%;width:auto;height:auto;display:block" alt="3D爆炸左侧图" />
-</div>
-
-<div style="flex:1;display:flex;align-items:center;justify-content:center;border-radius:12px;overflow:hidden;">
-    <img src="./images/boom.gif" style="max-width:100%;max-height:100%;width:auto;height:auto;display:block" alt="3D爆炸右侧图" />
-</div>
-</div>
+<p align="center">
+	<img width="45%" src="./images/boom.png">
+    &nbsp;
+    <img width="45%" src="./images/boom.gif">
+</p>
 
 ### 4. 上位机运行
 安装PowerPico Client使用即可，目前只支持window。
@@ -86,37 +81,21 @@
 
     Power-Pico硬件目前只支持 **中文简体/English** 2种语言。
 
-    <div style="display:flex;gap:15px;justify-content:center;align-items:center;margin-bottom:20px">
-
-    <div style="flex:1;display:flex;align-items:center;justify-content:center;border-radius:12px;overflow:hidden;">
-        <img src="./images/key_func.png" style="max-width:100%;max-height:100%;width:auto;height:auto;display:block" alt="按键说明图" />
-    </div>
-
-    <div style="flex:1;display:flex;align-items:center;justify-content:center;border-radius:12px;overflow:hidden;">
-        <img src="./images/startup_page.png" style="max-width:100%;max-height:100%;width:auto;height:auto;display:block" alt="开机界面图" />
-    </div>
-
-    <div style="flex:1;display:flex;align-items:center;justify-content:center;border-radius:12px;overflow:hidden;">
-        <img src="./images/main_page.png" style="max-width:100%;max-height:100%;width:auto;height:auto;display:block" alt="main界面图" />
-    </div>
-
-    </div>
-
-    <div style="display:flex;gap:15px;justify-content:center;align-items:center;margin-bottom:20px">
-
-    <div style="flex:1;display:flex;align-items:center;justify-content:center;border-radius:12px;overflow:hidden;">
-        <img src="./images/set_page.png" style="max-width:100%;max-height:100%;width:auto;height:auto;display:block" alt="设置界面图" />
-    </div>
-
-    <div style="flex:1;display:flex;align-items:center;justify-content:center;border-radius:12px;overflow:hidden;">
-        <img src="./images/pps_page1.png" style="max-width:100%;max-height:100%;width:auto;height:auto;display:block" alt="PPS界面1" />
-    </div>
-
-    <div style="flex:1;display:flex;align-items:center;justify-content:center;border-radius:12px;overflow:hidden;">
-        <img src="./images/pps_page2.png" style="max-width:100%;max-height:100%;width:auto;height:auto;display:block" alt="PPS界面2" />
-    </div>
-
-    </div>
+    <p align="center">
+        <img width="45%" src="./images/key_func.png">
+        &nbsp;
+        <img width="45%" src="./images/startup_page.png">
+    </p>
+    <p align="center">
+        <img width="45%" src="./images/main_page.png">
+        &nbsp;
+        <img width="45%" src="./images/set_page.png">
+    </p>
+    <p align="center">
+        <img width="45%" src="./images/pps_page1.png">
+        &nbsp;
+        <img width="45%" src="./images/pps_page2.png">
+    </p>
 
 2. 客户端操作说明
 
@@ -124,27 +103,16 @@
 
     PowerPico Client客户端上位机的具体使用方法详见：[客户端操作说明](https://no-chicken.com/content/Power-Pico/UserManual/client_operation.html)
 
-    <div style="display:flex;gap:15px;justify-content:center;align-items:center;margin-bottom:20px">
-
-    <div style="flex:1;display:flex;align-items:center;justify-content:center;border-radius:12px;overflow:hidden;">
-        <img src="./images/wave_client1.png" style="max-width:100%;max-height:100%;width:auto;height:auto;display:block" alt="波形界面图" />
-    </div>
-
-    <div style="flex:1;display:flex;align-items:center;justify-content:center;border-radius:12px;overflow:hidden;">
-        <img src="./images/firmware_client.png" style="max-width:100%;max-height:100%;width:auto;height:auto;display:block" alt="固件升级界面" />
-    </div>
-
-    <div style="display:flex;gap:15px;justify-content:center;align-items:center;margin-bottom:20px">
-
-    <div style="flex:1;display:flex;align-items:center;justify-content:center;border-radius:12px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.1);background:rgba(255,255,255,0.3);min-height:200px">
-        <img src="./images/wave_client2.png" style="max-width:100%;max-height:100%;width:auto;height:auto;display:block" alt="波形界面图2" />
-    </div>
-
-    <div style="flex:1;display:flex;align-items:center;justify-content:center;border-radius:12px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.1);background:rgba(255,255,255,0.3);min-height:200px">
-        <img src="./images/set_client.png" style="max-width:100%;max-height:100%;width:auto;height:auto;display:block" alt="设置界面" />
-    </div>
-
-    </div>
+    <p align="center">
+        <img width="45%" src="./images/wave_client1.png">
+        &nbsp;
+        <img width="45%" src="./images/firmware_client.png">
+    </p>
+    <p align="center">
+        <img width="45%" src="./images/wave_client2.png">
+        &nbsp;
+        <img width="45%" src="./images/set_client.png">
+    </p>
 
 ## 📂 项目结构
 ```text
@@ -164,14 +132,16 @@ Power-Pico/
 <li>第3个sector的16kB区域为升级信息区域，用于开机校检App完整性，具体的校检内容详见BootLoader代码</li>
 <li>从0x08010000第4个扇区开始后的区域，都为App区域（之所以不做AB分区是片上Flash不够）</li>
 </ul>
-<div style="margin-top:20px;text-align:center">
-    <img src="./images/flash.png" style="width:75%;border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,0.1);display:inline-block" alt="flash分区图" />
-</div>
+
+<p align="center">
+    <img width="75%" src="./images/flash.png">
+</p>
 
 使用USB进行高速数据传输，数据包组成如下图所示。每个数据包100组数据，加上头共计711Bytes。
-<div style="margin-top:20px;text-align:center">
-    <img src="./images/protocol.png" style="width:100%;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.1);display:inline-block" alt="数据包结构图" />
-</div>
+
+<p align="center">
+    <img width="75%" src="./images/protocol.png">
+</p>
 
 📖 参考资料
 
