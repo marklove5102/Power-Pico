@@ -26,6 +26,12 @@
     <img border="1px" width="75%" src="./images/main2316.png">
 </p>
 
+<p align="center">
+	<a href="https://space.bilibili.com/34154740">my bilibili</a> |
+	<a href="">demo video </a> |
+    <a href="https://oshwhub.com/no_chicken/powerpico">hardware open source</a>
+</p>
+
 ### ✨ Core Features
 - **μA-Level High Precision**: Utilizes the INA190 zero-drift amplifier with three-resistor segmented sampling.
 - **Protocol Trigger**: Supports PD2.0 PPS protocol triggering, with up to 20V/5A output.

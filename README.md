@@ -25,6 +25,12 @@
 	<img border="1px" width="75%" src="./images/main2316.png">
 </p>
 
+<p align="center">
+	<a href="https://space.bilibili.com/34154740">bilibili主页 </a> |
+	<a href="">演示视频 </a> |
+    <a href="https://oshwhub.com/no_chicken/powerpico">硬件开源 </a>
+</p>
+
 ### ✨ 核心特性
 - **uA 级高精度**：采用 INA190 零漂移放大器，配合三档电阻分段采样。
 - **协议诱骗**：支持 PD2.0 PPS 协议诱骗，最高支持 20V/5A 诱骗输出。
@@ -49,7 +55,7 @@
 
 ### 1.硬件
 自行焊接硬件，或购买淘宝已经焊接组装好的套件
-立创开源界面：https://oshwhub.com/no_chicken/powerpico
+立创硬件开源界面：https://oshwhub.com/no_chicken/powerpico
 
 ### 2. 固件自行编译烧录
 项目基于 Keil MDK 开发：
