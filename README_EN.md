@@ -6,14 +6,13 @@
   <h1 align="center">Power-Pico</h1>
   <p align="center">A Product-Grade Portable USB Ammeter and Low-Power Measurement Analyzer</p>
 
-  <img src="https://img.shields.io/badge/Version-1.0.0-blue">
+  <img src="https://img.shields.io/badge/Version-1.0.5-blue">
   <img src="https://img.shields.io/badge/License-GPL3.0-green">
   <img src="https://img.shields.io/badge/MCU-STM32F411-lightblue">
-  <img src="https://img.shields.io/badge/UI-LVGL_v8.3-red">
+  <img src="https://img.shields.io/badge/UI-LVGL_v9.2-red">
   <img src="https://img.shields.io/badge/OS-FreeRTOS-green">
   <br>
   <img src="https://img.shields.io/github/stars/kingham/Power-Pico?style=flat-square">
-  <img src="https://img.shields.io/github/forks/kingham/Power-Pico?style=flat-square">
 </div>
 
 ---
