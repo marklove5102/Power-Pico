@@ -42,6 +42,8 @@
 
 ## 🛠️ 硬件参数分析
 
+<div align="center">
+
 | 模块 | 选型 | 优势 |
 | :--- | :--- | :--- |
 | **主控** | STM32F411CEU6 | 100MHz 高主频，支持 DSP 指令加速波形处理 |
@@ -49,6 +51,7 @@
 | **ADC** | 12-bit (STM32 Internal) | 配合 DMA 实现 10kHz 以上的高速稳定采样 |
 | **屏幕** | 1.54" TFT (ST7789) | 240x240 分辨率，高对比度显示 |
 
+<div align="center">
 ---
 
 ## 🚀 快速复刻
@@ -73,7 +76,7 @@
 <p align="center">
 	<img width="45%" src="./images/boom.png">
     &nbsp;
-    <img width="45%" src="./images/boom.gif">
+    <img width="40%" src="./images/boom.gif">
 </p>
 
 ### 4. 上位机运行
@@ -88,19 +91,19 @@
     Power-Pico硬件目前只支持 **中文简体/English** 2种语言。
 
     <p align="center">
-        <img width="45%" src="./images/key_func.png">
+        <img width="25%" src="./images/key_func.png">
         &nbsp;
-        <img width="45%" src="./images/startup_page.png">
+        <img width="25%" src="./images/startup_page.png">
     </p>
     <p align="center">
-        <img width="45%" src="./images/main_page.png">
+        <img width="25%" src="./images/main_page.png">
         &nbsp;
-        <img width="45%" src="./images/set_page.png">
+        <img width="25%" src="./images/set_page.png">
     </p>
     <p align="center">
-        <img width="45%" src="./images/pps_page1.png">
+        <img width="25%" src="./images/pps_page1.png">
         &nbsp;
-        <img width="45%" src="./images/pps_page2.png">
+        <img width="25%" src="./images/pps_page2.png">
     </p>
 
 2. 客户端操作说明
@@ -149,7 +152,7 @@ Power-Pico/
     <img width="75%" src="./images/protocol.png">
 </p>
 
-📖 参考资料
+## 📖 参考资料
 
 <ul>
     <li style="margin-bottom:8px"><a href="https://github.com/ryan-ma/PD_Micro">[1] PD_Micro - ATMega32U4 Arduino板上的USB-C PD3.0 PPS</a></li>
@@ -161,6 +164,6 @@ Power-Pico/
     <li style="margin-bottom:8px"><a href="https://github.com/lvgl/lvgl">[7] LVGL - Embedded graphics library </a></li>
 </ul>
 
-🤝 提交共享
+## 🤝 提交共享
 
 欢迎提交 Issue 或 Pull Request 来增加项目功能，或修改代码bug!!

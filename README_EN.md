@@ -43,12 +43,16 @@
 
 ## 🛠️ Hardware Parameter Analysis
 
+<div align="center">
+
 | Module | Model | Advantage |
 | :--- | :--- | :--- |
 | **MCU** | STM32F411CEU6 | 100MHz high frequency, supports DSP instructions to accelerate waveform processing |
 | **Current Sensing** | INA190 | 0.5nA input bias current, the core guarantee for μA-level measurement |
 | **ADC** | 12-bit (STM32 Internal) | Achieves high-speed stable sampling above 10kHz with DMA |
 | **Screen** | 1.54" TFT (ST7789) | 240x240 resolution, high-contrast display |
+
+</div>
 
 ---
 
@@ -74,7 +78,7 @@ The exploded 3D view is as follows:
 <p align="center">
     <img width="45%" src="./images/boom.png">
     &nbsp;
-    <img width="45%" src="./images/boom.gif">
+    <img width="40%" src="./images/boom.gif">
 </p>
 
 ### 4. Running the PC Client
@@ -89,19 +93,19 @@ Install and use the PowerPico Client. Currently, it only supports Windows.
     The Power-Pico hardware currently supports 2 languages: **Simplified Chinese/English**.
 
     <p align="center">
-        <img width="45%" src="./images/key_func.png">
+        <img width="25%" src="./images/key_func.png">
         &nbsp;
-        <img width="45%" src="./images/startup_page.png">
+        <img width="25%" src="./images/startup_page.png">
     </p>
     <p align="center">
-        <img width="45%" src="./images/main_page.png">
+        <img width="25%" src="./images/main_page.png">
         &nbsp;
-        <img width="45%" src="./images/set_page.png">
+        <img width="25%" src="./images/set_page.png">
     </p>
     <p align="center">
-        <img width="45%" src="./images/pps_page1.png">
+        <img width="25%" src="./images/pps_page1.png">
         &nbsp;
-        <img width="45%" src="./images/pps_page2.png">
+        <img width="25%" src="./images/pps_page2.png">
     </p>
 
 2. Client Operation
