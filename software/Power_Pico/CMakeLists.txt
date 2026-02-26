@@ -44,54 +44,67 @@ add_executable(${CMAKE_PROJECT_NAME})
 # Add STM32CubeMX generated sources
 add_subdirectory(cmake/stm32cubemx)
 
-# Create output directory for hex and bin files
-set(OUTPUT_PATH ${CMAKE_BINARY_DIR}/output)
-file(MAKE_DIRECTORY ${OUTPUT_PATH})
-
-# Add post-build step to generate hex and bin files
-add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_OBJCOPY} -O ihex $<TARGET_FILE:${CMAKE_PROJECT_NAME}> ${OUTPUT_PATH}/${CMAKE_PROJECT_NAME}.hex
-    COMMAND ${CMAKE_OBJCOPY} -O binary $<TARGET_FILE:${CMAKE_PROJECT_NAME}> ${OUTPUT_PATH}/${CMAKE_PROJECT_NAME}.bin
-    COMMENT "Generating hex and bin files")
-
-# =========================================================
-# 创建一个虚拟的全局配置包裹 (INTERFACE 表示它不编译任何代码，只提供属性)
-add_library(sys_config INTERFACE)
-
-# 把系统需要的所有核心路径全塞进包裹里
-target_include_directories(sys_config INTERFACE
-    ${CMAKE_SOURCE_DIR}/Core/Inc
-    ${CMAKE_SOURCE_DIR}/USB_DEVICE/App
-    ${CMAKE_SOURCE_DIR}/USB_DEVICE/Target
-    ${CMAKE_SOURCE_DIR}/Drivers/STM32F4xx_HAL_Driver/Inc
-    ${CMAKE_SOURCE_DIR}/Drivers/STM32F4xx_HAL_Driver/Inc/Legacy
-    ${CMAKE_SOURCE_DIR}/Middlewares/Third_Party/FreeRTOS/Source/include
-    ${CMAKE_SOURCE_DIR}/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2
-    ${CMAKE_SOURCE_DIR}/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F
-    ${CMAKE_SOURCE_DIR}/Middlewares/ST/STM32_USB_Device_Library/Core/Inc
-    ${CMAKE_SOURCE_DIR}/Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc
-    ${CMAKE_SOURCE_DIR}/Drivers/CMSIS/Device/ST/STM32F4xx/Include
-    ${CMAKE_SOURCE_DIR}/Drivers/CMSIS/Include
+# Link directories setup
+target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
+    # Add user defined library search paths
 )
 
-# 把核心的宏定义也塞进包裹里
-target_compile_definitions(sys_config INTERFACE
-    USE_HAL_DRIVER
-    STM32F411xE
+# Collect all source files using file globbing
+file(GLOB_RECURSE LVGL_SOURCES
+    "Middlewares/LVGL/src/*.c"
+    "Middlewares/LVGL/src/*.cpp"
+    "Middlewares/LVGL/porting/*.c"
+)
+file(GLOB_RECURSE USER_SOURCES "User/**/*.c")
+file(GLOB_RECURSE BSP_SOURCES "BSP/**/*.c")
+
+
+# Add sources to executable
+target_sources(${CMAKE_PROJECT_NAME} PRIVATE
+    # Add user sources here
+    ${LVGL_SOURCES}
+    ${USER_SOURCES}
+    ${BSP_SOURCES}
 )
 
-# 挂载子目录
-add_subdirectory(Middlewares/LVGL)
-add_subdirectory(BSP)
-add_subdirectory(User)
+# Add include paths
+target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
+    # Add user defined include paths
+    Middlewares/LVGL
+    Middlewares/LVGL/src
+    Middlewares/LVGL/porting
+    BSP
+    BSP/BEEP
+    BSP/EEPROM
+    BSP/GATE
+    BSP/KEY
+    BSP/LCD
+    BSP/PD
+    User/Tasks/Inc
+    User/GUI
+    User/GUI/common
+    User/GUI/screens
+)
 
-# =========================================================
+# Add project symbols (macros)
+target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
+    # Add user defined symbols
+)
 
 # Add linked libraries
 target_link_libraries(${CMAKE_PROJECT_NAME}
     stm32cubemx
+
     # Add user defined libraries
-    lvgl
-    bsp
-    user_app
+)
+
+# Create output directory for .hex and .bin files
+set(OUTPUT_PATH ${CMAKE_BINARY_DIR}/output)
+file(MAKE_DIRECTORY ${OUTPUT_PATH})
+
+# Add custom target to generate .hex and .bin files
+add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_OBJCOPY} -O ihex $<TARGET_FILE:${CMAKE_PROJECT_NAME}> ${OUTPUT_PATH}/${CMAKE_PROJECT_NAME}.hex
+    COMMAND ${CMAKE_OBJCOPY} -O binary $<TARGET_FILE:${CMAKE_PROJECT_NAME}> ${OUTPUT_PATH}/${CMAKE_PROJECT_NAME}.bin
+    COMMENT "Generating .hex and .bin files"
 )
