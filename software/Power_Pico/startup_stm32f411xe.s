@@ -58,17 +58,14 @@ defined in linker script */
   .weak  Reset_Handler
   .type  Reset_Handler, %function
 Reset_Handler:
-  ldr   sp, =_estack    		 /* set stack pointer */
+  ldr   sp, =_estack      /* set stack pointer */
 
-/* Call the clock system initialization function.*/
+  /* 强行挪到这里：先执行 SystemInit 重定向中断向量表 */
   bl  SystemInit
 
 /* Copy the data segment initializers from flash to SRAM */
-  ldr r0, =_sdata
-  ldr r1, =_edata
-  ldr r2, =_sidata
-  movs r3, #0
-  b LoopCopyDataInit
+  movs  r1, #0
+  b  LoopCopyDataInit
 
 CopyDataInit:
   ldr r4, [r2, r3]
