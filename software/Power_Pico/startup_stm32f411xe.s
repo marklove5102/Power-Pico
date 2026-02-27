@@ -26,7 +26,7 @@
 
   .syntax unified
   .cpu cortex-m4
-  .fpu fpv4-sp-d16
+  .fpu softvfp
   .thumb
 
 .global  g_pfnVectors
@@ -58,14 +58,17 @@ defined in linker script */
   .weak  Reset_Handler
   .type  Reset_Handler, %function
 Reset_Handler:
-  ldr   sp, =_estack      /* set stack pointer */
+  ldr   sp, =_estack    		 /* set stack pointer */
 
-  /* 强行挪到这里：先执行 SystemInit 重定向中断向量表 */
+/* Call the clock system initialization function.*/
   bl  SystemInit
 
 /* Copy the data segment initializers from flash to SRAM */
-  movs  r1, #0
-  b  LoopCopyDataInit
+  ldr r0, =_sdata
+  ldr r1, =_edata
+  ldr r2, =_sidata
+  movs r3, #0
+  b LoopCopyDataInit
 
 CopyDataInit:
   ldr r4, [r2, r3]

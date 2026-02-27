@@ -52,7 +52,6 @@ target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
 # Collect all source files using file globbing
 file(GLOB_RECURSE LVGL_SOURCES
     "Middlewares/LVGL/src/*.c"
-    "Middlewares/LVGL/src/*.cpp"
     "Middlewares/LVGL/porting/*.c"
 )
 file(GLOB_RECURSE USER_SOURCES "User/**/*.c")
