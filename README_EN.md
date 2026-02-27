@@ -89,7 +89,7 @@ The exploded 3D view is as follows:
 </p>
 
 ### 4. Running the PC Client
-Install and use the PowerPico Client. Currently, it only supports Windows.
+Install and use the PowerPico Client. Currently, it only supports Windows operation system.
 
 ## 🛠️ User Guide
 

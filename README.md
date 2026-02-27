@@ -88,7 +88,7 @@
 </p>
 
 ### 4. 上位机运行
-安装PowerPico Client使用即可，目前只支持window。
+安装PowerPico Client使用即可，目前只支持windows操作系统。
 
 ## 🛠️ 使用说明
 
