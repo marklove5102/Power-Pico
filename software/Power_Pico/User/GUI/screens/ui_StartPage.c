@@ -53,7 +53,7 @@ void ui_StartPage_screen_init(void)
     lv_obj_set_style_border_opa(ui_Panel1, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_Image2 = lv_image_create(ui_Panel1);
-    lv_image_set_src(ui_Image2, &ui_img_chicken_png);
+    lv_image_set_src(ui_Image2, &ui_img_chicken96_png);
     lv_obj_set_width(ui_Image2, LV_SIZE_CONTENT);   /// 128
     lv_obj_set_height(ui_Image2, LV_SIZE_CONTENT);    /// 128
     lv_obj_set_x(ui_Image2, -4);
@@ -61,7 +61,7 @@ void ui_StartPage_screen_init(void)
     lv_obj_set_align(ui_Image2, LV_ALIGN_CENTER);
     lv_obj_add_flag(ui_Image2, LV_OBJ_FLAG_CLICKABLE);     /// Flags
     lv_obj_remove_flag(ui_Image2, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-    lv_image_set_scale(ui_Image2, 196);
+    lv_image_set_scale(ui_Image2, 256);
 
     ui_Label1 = lv_label_create(ui_StartPage);
     lv_obj_set_width(ui_Label1, LV_SIZE_CONTENT);   /// 1

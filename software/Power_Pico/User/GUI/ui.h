@@ -24,7 +24,7 @@ LV_FONT_DECLARE(ui_font_zhongyuan18);
 LV_FONT_DECLARE(ui_font_zhongyuan20);
 
 // IMAGES AND IMAGE SETS
-LV_IMG_DECLARE(ui_img_chicken_png);
+LV_IMG_DECLARE(ui_img_chicken96_png);
 
 #ifdef __cplusplus
 } /*extern "C"*/
