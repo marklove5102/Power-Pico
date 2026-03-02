@@ -114,7 +114,15 @@
         <img width="25%" src="./images/pps_page2.png">
     </p>
 
-2. 客户端操作说明
+2. PPS诱骗操作说明
+
+    首先进入setting界面，来到诱骗选项，点击确认，进入诱骗，然后即可进行电压调节。注意：目前只支持 PPS 诱骗！测试时需要看下充电头协议支持！
+
+    <p align="center">
+        <img width="100%" src="./images/test/PPS.gif">
+    </p>
+
+3. 客户端操作说明
 
     PowerPico Client电脑客户端可以用于波形查看、记录、导出；能够进行对下位机硬件的固件升级。客户端目前支持 **中文简体/中文繁体/English/日本語** 4种语言。
 
