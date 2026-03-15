@@ -23,7 +23,7 @@
 
 <p align="center">
 	<a href="https://space.bilibili.com/34154740">bilibili主页 </a> |
-	<a href="">演示视频 </a> |
+	<a href="https://www.bilibili.com/video/BV1c7wuzSEqx/">演示视频 </a> |
     <a href="https://oshwhub.com/no_chicken/powerpico">硬件开源 </a>
 </p>
 

@@ -23,7 +23,7 @@
 
 <p align="center">
 	<a href="https://space.bilibili.com/34154740">my bilibili</a> |
-	<a href="">demo video </a> |
+	<a href="https://www.bilibili.com/video/BV1c7wuzSEqx/">demo video </a> |
     <a href="https://oshwhub.com/no_chicken/powerpico">hardware open source</a>
 </p>
 
