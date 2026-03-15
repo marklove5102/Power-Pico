@@ -107,6 +107,7 @@ void MX_ADC1_Init(void);
 
 /* USER CODE BEGIN Prototypes */
 
+void Process_ADC_Chunk(uint16_t *chunk_ptr, uint8_t packet_idx);
 void Data_Monitor_Get_Values(float *out_vol_v, float *out_cur_ua);
 void Data_Monitor_Clear(void);
 

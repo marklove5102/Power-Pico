@@ -26,6 +26,7 @@
 #include "usb_device.h"
 #include "usbd_cdc_if.h"
 #include "gate.h"
+#include "user_TasksInit.h"
 
 // DMA 双缓冲原始数据 [200行][5列]
 uint16_t adc_raw_buffer[ADC_TIMES * 2][ADC_CHANNELS];
@@ -304,7 +305,7 @@ void Data_Monitor_Clear(void)
 }
 
 // 处理 ADC 数据块的核心函数，负责数据选择、切换决策和USB发送
-static void Process_ADC_Chunk(uint16_t *chunk_ptr, uint8_t packet_idx)
+void Process_ADC_Chunk(uint16_t *chunk_ptr, uint8_t packet_idx)
 {
     USB_ADC_Packet_t *pkg = &usb_packet_buffer[packet_idx];
 
@@ -427,8 +428,10 @@ static void Process_ADC_Chunk(uint16_t *chunk_ptr, uint8_t packet_idx)
         low_underload_cnt = 0;
     }
 
-    // USB 发送 (非阻塞)
-    CDC_Transmit_FS((uint8_t*)pkg, sizeof(USB_ADC_Packet_t));
+    // USB 发送前，检查设备状态是否为 CONFIGURED
+    if (USER_USB_is_Configured()) {
+        CDC_Transmit_FS((uint8_t*)pkg, sizeof(USB_ADC_Packet_t));
+    }
 
     //
     monitor_chunk_counter++;
@@ -445,14 +448,16 @@ void HAL_ADC_ConvHalfCpltCallback(ADC_HandleTypeDef* hadc)
 {
     // 处理前半段 (Buffer 行 0 ~ 99)
     // 传入 &adc_raw_buffer[0][0]
-    Process_ADC_Chunk(&adc_raw_buffer[0][0], 0);
+    // Process_ADC_Chunk(&adc_raw_buffer[0][0], 0);
+    osThreadFlagsSet(MessageSendTaskHandle, FLAG_ADC_HALF_READY); // 交给task中进行处理
 }
 
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 {
     // 处理后半段 (Buffer 行 100 ~ 199)
     // 传入 &adc_raw_buffer[ADC_TIMES][0]
-    Process_ADC_Chunk(&adc_raw_buffer[ADC_TIMES][0], 1);
+    // Process_ADC_Chunk(&adc_raw_buffer[ADC_TIMES][0], 1);
+    osThreadFlagsSet(MessageSendTaskHandle, FLAG_ADC_FULL_READY); // 交给task中进行处理
 }
 
 /* USER CODE END 1 */
