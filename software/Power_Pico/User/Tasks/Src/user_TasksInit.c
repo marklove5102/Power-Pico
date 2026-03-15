@@ -41,12 +41,20 @@ const osThreadAttr_t HardwareInitTask_attributes = {
   .priority = (osPriority_t) osPriorityHigh,
 };
 
-// message task
-osThreadId_t MessageTaskHandle;
-const osThreadAttr_t MessageTask_attributes = {
-  .name = "MessageTask",
+// message receive task
+osThreadId_t MessageReceiveTaskHandle;
+const osThreadAttr_t MessageReceiveTask_attributes = {
+  .name = "MessageReceiveTask",
   .stack_size = 128 * 1,
   .priority = (osPriority_t) osPriorityNormal2,
+};
+
+// message send task
+osThreadId_t MessageSendTaskHandle;
+const osThreadAttr_t MessageSendTask_attributes = {
+  .name = "MessageSendTask",
+  .stack_size = 128 * 8,
+  .priority = (osPriority_t) osPriorityHigh,
 };
 
 // Key task
@@ -107,7 +115,8 @@ void User_Tasks_Init(void)
   HardwareInitTaskHandle  = osThreadNew(HardwareInitTask, NULL, &HardwareInitTask_attributes);
   PDUFPTaskHandle          = osThreadNew(PDUFPTask, NULL, &PDUFPTask_attributes);
   KeyTaskHandle 			    = osThreadNew(KeyTask, NULL, &KeyTask_attributes);
-  MessageTaskHandle       = osThreadNew(MessageTask, NULL, &MessageTask_attributes);
+  MessageReceiveTaskHandle  = osThreadNew(MessageReceiveTask, NULL, &MessageReceiveTask_attributes);
+  MessageSendTaskHandle     = osThreadNew(MessageSendTask, NULL, &MessageSendTask_attributes);
   LvHandlerTaskHandle     = osThreadNew(LvHandlerTask, NULL, &LvHandlerTask_attributes);
 
   /* add events, ... */

@@ -5,8 +5,8 @@
 extern "C" {
 #endif
 
-void MessageTask(void *argument);
-
+void MessageReceiveTask(void *argument);
+void MessageSendTask(void *argument);
 
 #ifdef __cplusplus
 }
