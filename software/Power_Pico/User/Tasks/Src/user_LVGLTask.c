@@ -41,12 +41,13 @@ void TaskTickHook(void)
 void LvHandlerTask(void *argument)
 {
   key_event_t key_event;
+  uint32_t _time = 1; // default delay time
   while(1)
   {
     if(osMessageQueueGet(Key_MessageQueue, &key_event, NULL, 1)==osOK) {
       lv_lib_pm_handle_key_event(&key_event);
     }
-		lv_task_handler();
-    osDelay(1);
+		_time = lv_timer_handler();
+    osDelay(_time);
 	}
 }
