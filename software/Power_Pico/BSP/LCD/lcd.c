@@ -71,6 +71,8 @@ void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
 {
     if (hspi->Instance == SPI2)
     {
+		// 确保最后一位数据离开 STM32 的移位寄存器
+        while (hspi->Instance->SR & SPI_FLAG_BSY);
         // 通知 LVGL 渲染结束，执行回调函数
         if (lcd_ready_cb) {
             LCD_CallbackFunc_t func = (LCD_CallbackFunc_t)lcd_ready_cb;
