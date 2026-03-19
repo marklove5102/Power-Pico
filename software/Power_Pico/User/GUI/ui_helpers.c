@@ -8,7 +8,12 @@
 
 #include "./ui_helpers.h"
 
-///////////////////// ui help funtions ////////////////////
+///////////////////// ui variables ////////////////////
+
+float ui_current_voltage = 0.0f; // 当前电压，单位 V
+float ui_current_current = 0.0f; // 当前电流，单位 uA
+
+///////////////////// ui help functions ////////////////////
 
 void ui_full_screen_refresh(lv_obj_t * screen) {
     // 标记整个屏幕为脏区域
@@ -60,7 +65,12 @@ uint16_t ui_get_display_rotation(void) {
 
 // 获取当前电压, 单位 V; 当前电流, 单位 uA
 void ui_get_vol_cur(float *voltage, float *current) {
-    Data_Monitor_Get_Values(voltage, current);
+    if (voltage != NULL) {
+        *voltage = ui_current_voltage;
+    }
+    if (current != NULL) {
+        *current = ui_current_current;
+    }
 }
 
 //////////////// set functions ///////////////
@@ -85,8 +95,15 @@ void ui_set_display_rotation(uint16_t rotation) {
     Sys_Set_Rotation(rotation);
 }
 
+// 设置 UI 层的电压电流变量, 供 UI 层显示使用, 单位分别为 V 和 uA
+void ui_update_vol_cur_varables(float voltage, float current) {
+    ui_current_voltage = voltage;
+    ui_current_current = current;
+}
+
 void ui_clear_data_monitor(void) {
-    Data_Monitor_Clear();
+    // 不能直接访问其他层的数据，to be write
+    // Data_Monitor_Clear();
 }
 
 //////////////// sys save functions ///////////////

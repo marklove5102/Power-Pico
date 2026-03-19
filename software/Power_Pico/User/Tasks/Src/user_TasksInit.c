@@ -83,12 +83,22 @@ const osThreadAttr_t LvHandlerTask_attributes = {
 
 
 /* Message queues ------------------------------------------------------------*/
+
 // Key task 中发送出的按键信息的消息队列
+// 流向为 KeyTask -> LVGLtask
 osMessageQueueId_t Key_MessageQueue;
+
 // UI layer发送给PDUFPTask任务的命令消息队列
+// 流向为 LVGLtask -> PDUFPTask
 osMessageQueueId_t PD_cmd_MessageQueue;
+
 // PDUFPTask任务发送给UI层的通知处理情况的消息队列
+// 流向为 PDUFPTask -> LVGLtask
 osMessageQueueId_t PD_handle_event_MsgQueue;
+
+// 数据处理Task任务发送给UI层的电压电流数据的消息队列
+// 流向为 MessageSendTask -> LVGLtask
+osMessageQueueId_t PowerDataQueue;
 
 /* Private function prototypes -----------------------------------------------*/
 void LvHandlerTask(void *argument);
@@ -110,6 +120,7 @@ void User_Tasks_Init(void)
 	Key_MessageQueue  = osMessageQueueNew(4, sizeof(key_event_t), NULL);
   PD_cmd_MessageQueue = osMessageQueueNew(4, sizeof(PD_command_msg_t), NULL);
   PD_handle_event_MsgQueue = osMessageQueueNew(4, 1, NULL); // uint8_t message
+  PowerDataQueue = osMessageQueueNew(8, sizeof(PowerData_t), NULL);
 
 	/* add threads, ... */
   HardwareInitTaskHandle  = osThreadNew(HardwareInitTask, NULL, &HardwareInitTask_attributes);

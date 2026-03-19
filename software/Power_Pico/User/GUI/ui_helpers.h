@@ -11,7 +11,12 @@ extern "C" {
 #include "lvgl.h"
 #include "stdio.h"
 
-///////////////////// help funtions ////////////////////
+///////////////////// ui variables ////////////////////
+
+extern float ui_current_voltage;
+extern float ui_current_current;
+
+///////////////////// help functions ////////////////////
 
 void ui_full_screen_refresh(lv_obj_t * screen);
 
@@ -34,6 +39,7 @@ void ui_set_back_light_level(uint8_t level);
 void ui_set_key_sound_enable(bool enable);
 void ui_set_language_select(uint8_t lang);
 void ui_set_display_rotation(uint16_t rotation);
+void ui_update_vol_cur_varables(float voltage, float current);
 void ui_clear_data_monitor(void);
 
 // sys save function

@@ -71,5 +71,20 @@ void MessageSendTask(void *argument)
     {
         Process_ADC_Chunk(&adc_raw_buffer[ADC_TIMES][0], 1);
     }
+
+    // 发送数据给UI层进行显示
+    PowerData_t newData;
+    Data_Monitor_Get_Values(&newData.voltage, &newData.current);
+
+    // 尝试发送，如果不等待直接返回错误，说明队列可能满了
+    osStatus_t status = osMessageQueuePut(PowerDataQueue, &newData, 0, 0);
+
+    if (status == osErrorResource) {
+        PowerData_t dummy;
+        // 1. 强行从队列头部取出一个旧数据（丢弃）
+        osMessageQueueGet(PowerDataQueue, &dummy, NULL, 0);
+        // 2. 再次存入新数据
+        osMessageQueuePut(PowerDataQueue, &newData, 0, 0);
+    }
   }
 }
