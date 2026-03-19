@@ -287,7 +287,7 @@ static void Data_Monitor_Calculate_Average(void)
 // 外部调用的获取函数，单位 V 和 uA
 void Data_Monitor_Get_Values(float *out_vol_v, float *out_cur_ua)
 {
-    // 直接返回已经计算好的平均值，无需关中断，因为读取 float 是原子操作
+    // 直接返回已经计算好的平均值
     *out_vol_v = g_data_monitor.avg_vol_v;
     *out_cur_ua = g_data_monitor.avg_cur_ua;
 }
@@ -412,7 +412,7 @@ void Process_ADC_Chunk(uint16_t *chunk_ptr, uint8_t packet_idx)
         pkg->samples[i].cur_adc = final_cur;
         pkg->samples[i].ref_adc = raw_ref;
 
-        // 更新用于屏幕显示的统计数据
+        // 更新统计数据
         Data_Monitor_Update(raw_vol, final_cur, raw_ref, current_hw_range);
     }
 
