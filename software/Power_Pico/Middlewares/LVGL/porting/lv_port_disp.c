@@ -107,13 +107,6 @@ void lv_port_disp_init(void)
  *   STATIC FUNCTIONS
  **********************/
 
-void lcd_flush_ready_callback(void)
-{
-    if (g_current_disp_drv != NULL) {
-        lv_display_flush_ready(g_current_disp_drv);
-    }
-}
-
 /*Initialize your display and the required peripherals.*/
 static void disp_init(void)
 {
@@ -121,7 +114,6 @@ static void disp_init(void)
     LCD_Init();
     LCD_Fill(0,0, LCD_W, LCD_H, BLACK);
     LCD_Close_Light();
-    LCD_Set_Flush_Complete_Callback(lcd_flush_ready_callback);
 }
 
 volatile bool disp_flush_enabled = true;
@@ -148,18 +140,15 @@ static void disp_flush(lv_display_t * disp_drv, const lv_area_t * area, uint8_t 
 {
     static lv_display_rotation_t last_rotation = LV_DISPLAY_ROTATION_0;
     lv_display_rotation_t current_rotation = lv_display_get_rotation(disp_drv);
-    lv_area_t rotated_area;
+
     if (current_rotation != last_rotation) {
         LCD_SetRotation(current_rotation * 90); // 仅在旋转状态改变时调用
         last_rotation = current_rotation;      // 更新上次状态
     }
-    if(disp_flush_enabled) {
-        LCD_Color_Render_Async(area->x1,area->y1,area->x2,area->y2, (uint16_t *)px_map);
-    }
-
+    LCD_Color_Render_Async(area->x1,area->y1,area->x2,area->y2, (uint16_t *)px_map);
     /*IMPORTANT!!!
      *Inform the graphics library that you are ready with the flushing*/
-    // lv_display_flush_ready(disp_drv);
+    lv_display_flush_ready(disp_drv);
 }
 
 #else /*Enable this file at the top*/
