@@ -126,7 +126,7 @@ static void set_val_cur_label(float voltage, float current)
 
 // event funtions
 
-static void _flush_timer_cb()
+static void _flush_timer_cb(lv_timer_t * timer)
 {
     float voltage = 0.0;
     float current = 0.0;
