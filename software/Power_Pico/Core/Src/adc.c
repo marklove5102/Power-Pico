@@ -231,16 +231,16 @@ static void Data_Monitor_Update(uint16_t vol_adc, uint16_t cur_adc, uint16_t ref
     // 2. 计算电流 (单位: 10nA)
     // I_uA = ADC_Value * SCALE_XXX
     // I_10nA = I_uA * 100
-    uint64_t current_10na = 0;
+    int64_t current_10na = 0;
     switch (range) {
         case LOW_CUR:
-            current_10na = (uint64_t)((float)(cur_adc-ref_adc) * SCALE_LOW * 100.0f);
+            current_10na = (int64_t)((float)(cur_adc-ref_adc) * SCALE_LOW * 100.0f);
             break;
         case MID_CUR:
-            current_10na = (uint64_t)((float)(cur_adc-ref_adc) * SCALE_MID * 100.0f);
+            current_10na = (int64_t)((float)(cur_adc-ref_adc) * SCALE_MID * 100.0f);
             break;
         case HIGH_CUR:
-            current_10na = (uint64_t)((float)(cur_adc-ref_adc) * SCALE_HIGH * 100.0f);
+            current_10na = (int64_t)((float)(cur_adc-ref_adc) * SCALE_HIGH * 100.0f);
             break;
     }
 
