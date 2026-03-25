@@ -46,6 +46,9 @@ void HardwareInitTask(void *argument)
     Gate_Port_Init();
     flow_route_selection(HIGH_CUR);
 
+    // usb init
+    MX_USB_DEVICE_Init();
+
     // ADC sample start
     HAL_ADC_Start_DMA(&hadc1, (uint32_t *)adc_raw_buffer, ADC_TIMES*2 * ADC_CHANNELS); /*启动ADC的DMA传输，配合定时器触发ADC转换  12位的ADC对应0-4095 */
     HAL_TIM_Base_Start(&htim2); /*开启定时器，用溢出时间来触发ADC*/
