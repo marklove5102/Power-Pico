@@ -2,19 +2,22 @@
 #include "i2c.h"
 // hardware settings
 #include "lcd_init.h"
+#include "gate.h"
 
 typedef struct {
 	uint8_t  backlight_level;   // 0-100
 	uint8_t  key_sound_enable;  // 0:disable, 1:enable
 	uint8_t  language_select;   // 0:English, 1:Chinese
 	uint16_t  rotation;		    // 0, 90, 180, 270
+	uint8_t  current_range_mode; // 0:auto, 1:low, 2:mid, 3:high
 } SysSettings_T;
 
 static SysSettings_T sys_settings = {
 	.backlight_level = 50,
 	.key_sound_enable = 1,
 	.language_select = 0,
-	.rotation = 0
+	.rotation = 0,
+	.current_range_mode = GATE_MODE_AUTO
 };
 
 static void BL24C02_Write(uint8_t addr, uint16_t length, uint8_t buff[])
@@ -41,6 +44,7 @@ EEPROM Data description:
 [0x11]: user key_sound_enable setting
 [0x12]: user language_select setting
 [0x13-14]: user rotation setting
+[0x15]: user current range mode (0:auto,1:low,2:mid,3:high)
 
 [0x20-]: update command storage area, "update\r\n"
 *******************************************/
@@ -74,21 +78,22 @@ uint8_t EEPROM_Init_Check(void)
 // to Save the settings
 void EEPROM_SysSetting_Save(void)
 {
-	uint8_t buff[5];
+	uint8_t buff[6];
 	buff[0] = sys_settings.backlight_level;
 	buff[1] = sys_settings.key_sound_enable;
 	buff[2] = sys_settings.language_select;
 	buff[3] = (uint8_t)(sys_settings.rotation & 0x00FF);
 	buff[4] = (uint8_t)((sys_settings.rotation >> 8) & 0x00FF);
-	BL24C02_Write(0x10,5,buff);
+	buff[5] = sys_settings.current_range_mode;
+	BL24C02_Write(0x10,6,buff);
 }
 
 
 // to Get the settings
 void EEPROM_SysSetting_Get(void)
 {
-	uint8_t buff[5];
-	BL24C02_Read(0x10,5,buff);
+	uint8_t buff[6] = {0};
+	BL24C02_Read(0x10,6,buff);
 	// 判断是否在范围内
 	if(buff[0] <= 100)
 		sys_settings.backlight_level = buff[0];
@@ -107,6 +112,11 @@ void EEPROM_SysSetting_Get(void)
 		sys_settings.rotation = rotation;
 	else
 		sys_settings.rotation = 180;
+
+	if(buff[5] == GATE_MODE_AUTO || buff[5] == GATE_MODE_LOW || buff[5] == GATE_MODE_MID || buff[5] == GATE_MODE_HIGH)
+		sys_settings.current_range_mode = buff[5];
+	else
+		sys_settings.current_range_mode = GATE_MODE_AUTO;
 }
 
 // to write the update command
@@ -167,6 +177,14 @@ void Sys_Set_Rotation(uint16_t rotation)
 	}
 }
 
+void Sys_Set_CurrentRangeMode(uint8_t mode)
+{
+	if(mode == GATE_MODE_AUTO || mode == GATE_MODE_LOW || mode == GATE_MODE_MID || mode == GATE_MODE_HIGH) {
+		sys_settings.current_range_mode = mode;
+		Gate_Set_Mode(mode);
+	}
+}
+
 // Get functions
 
 uint8_t Sys_Get_BacklightLevel(void)
@@ -187,4 +205,9 @@ uint8_t Sys_Get_LanguageSelect(void)
 uint16_t Sys_Get_Rotation(void)
 {
 	return sys_settings.rotation;
+}
+
+uint8_t Sys_Get_CurrentRangeMode(void)
+{
+	return sys_settings.current_range_mode;
 }

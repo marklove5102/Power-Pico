@@ -30,7 +30,7 @@ extern "C" {
 
 /* USER CODE BEGIN Includes */
 
-#define ADC_TIMES 100 // 每次采样 100 次 (10ms)
+#define ADC_TIMES 25 // 每次采样 25 次 (2.5ms)
 #define ADC_CHANNELS 5 // 5 通道：电压 + 3 档电流 + REF
 #define PACKET_HEADER_0 0xAA
 #define PACKET_HEADER_1 0x55
@@ -62,12 +62,12 @@ extern "C" {
 #define MONITOR_UPDATE_PERIOD_MS 250
 #define MONITOR_UPDATE_CHUNK_COUNT (MONITOR_UPDATE_PERIOD_MS / 10)
 
-/* --- USB 数据包结构 (总长 711 字节) --- */
+/* --- USB 数据包结构 (总长 = 11 + 7*ADC_TIMES 字节) --- */
 #pragma pack(push, 1) // 强制 1 字节对齐
 typedef struct {
     uint8_t  header[2];      // 0x55, 0xAA
     uint64_t timestamp;      // 64位微秒级时间戳
-    uint8_t  data_count;     // 固定 100
+    uint8_t  data_count;     // 本包中有效的数据点数量 (尝试过25和100)
 
     struct {
         uint8_t  range;      // 量程: 1=Low, 2=Mid, 3=High

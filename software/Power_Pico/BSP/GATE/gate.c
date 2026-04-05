@@ -1,7 +1,8 @@
 #include "gate.h"
 #include "math.h"
 
-uint8_t gate_status = HIGH_CUR; // Default status
+static uint8_t gate_status = HIGH_CUR; // Default status
+static uint8_t gate_mode = GATE_MODE_AUTO; // Default mode
 
 void Gate_Port_Init(void)
 {
@@ -30,6 +31,7 @@ void Gate_Port_Init(void)
   HAL_GPIO_Init(EN2_PORT, &GPIO_InitStruct);
 }
 
+// 根据选择设置流路
 void flow_route_selection(uint8_t selection)
 {
   if(selection > HIGH_CUR)
@@ -54,8 +56,29 @@ void flow_route_selection(uint8_t selection)
   gate_status = selection; // Update the status
 }
 
+// 获取当前档位状态
 uint8_t Gate_get_status(void)
 {
   return gate_status;
+}
+
+// 这个函数允许用户直接设置档位模式，自动模式会根据当前电流情况自动切换档位
+void Gate_Set_Mode(uint8_t mode)
+{
+  if (mode == GATE_MODE_AUTO) {
+    gate_mode = GATE_MODE_AUTO;
+    return;
+  }
+
+  if (mode == GATE_MODE_LOW || mode == GATE_MODE_MID || mode == GATE_MODE_HIGH) {
+    gate_mode = mode;
+    flow_route_selection(mode);
+  }
+}
+
+// 获取当前档位模式
+uint8_t Gate_Get_Mode(void)
+{
+  return gate_mode;
 }
 

@@ -20,12 +20,17 @@ static inline uint32_t op_t(uint32_t val) { UNUSED(val); return 0; }
 static lv_i18n_phrase_t en_singulars[] = {
     {"press to Step Adjust", "press to Step Adjust"},
     {"press here to Fixed Set", "press here to Fixed Set"},
-    {"press here to close PD", "press here to close PD"},
+    {"press here to close PPS", "press here to close PPS"},
     {"Screen Brightness :", "Screen Brightness :"},
     {"Enable key sound", "Enable key sound"},
     {"Enable Chinese", "Enable Chinese"},
     {"Chose Rotation", "Chose Rotation"},
-    {"PD Sink", "PD Sink"},
+    {"Current Range", "Current Range"},
+    {"AUTO", "AUTO"},
+    {"LOW", "LOW"},
+    {"MID", "MID"},
+    {"HIGH", "HIGH"},
+    {"PPS Sink", "PPS Sink"},
     {"Please reboot to apply\nall changes!", "Please reboot to apply\nall changes!"},
     {NULL, NULL} // End mark
 };
@@ -52,12 +57,17 @@ static const lv_i18n_lang_t en_lang = {
 static lv_i18n_phrase_t zh_cn_singulars[] = {
     {"press to Step Adjust", "进 入 步 进 调 节"},
     {"press here to Fixed Set", "进 入 固 定 调 节"},
-    {"press here to close PD", "关 闭 PD 诱 骗"},
+    {"press here to close PPS", "关 闭 PPS 诱 骗"},
     {"Screen Brightness :", "屏 幕 亮 度 :"},
     {"Enable key sound", "按 键 声 音"},
     {"Enable Chinese", "中 英 文 切 换"},
     {"Chose Rotation", "旋 转 角 度 :"},
-    {"PD Sink", "PD 诱 骗"},
+    {"Current Range", "当 前 量 程 :"},
+    {"AUTO", "自 动"},
+    {"LOW", "低 档"},
+    {"MID", "中 档"},
+    {"HIGH", "高 档"},
+    {"PPS Sink", "PPS 诱 骗"},
     {"Please reboot to apply\nall changes!", "请重启以应用\n所有更改!"},
     {NULL, NULL} // End mark
 };

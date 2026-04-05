@@ -19,6 +19,7 @@ void Sys_Set_BacklightLevel(uint8_t level);
 void Sys_Set_KeySoundEnable(bool enable);
 void Sys_Set_LanguageSelect(uint8_t lang);
 void Sys_Set_Rotation(uint16_t rotation);
+void Sys_Set_CurrentRangeMode(uint8_t mode);
 
 // get functions
 
@@ -26,5 +27,6 @@ uint8_t Sys_Get_BacklightLevel(void);
 uint8_t Sys_Get_KeySoundEnable(void);
 uint8_t Sys_Get_LanguageSelect(void);
 uint16_t Sys_Get_Rotation(void);
+uint8_t Sys_Get_CurrentRangeMode(void);
 
 #endif

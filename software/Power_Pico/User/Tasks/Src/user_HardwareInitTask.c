@@ -66,6 +66,7 @@ void HardwareInitTask(void *argument)
     if(!EEPROM_Init_Check()) {
       EEPROM_SysSetting_Get();
     }
+    Gate_Set_Mode(Sys_Get_CurrentRangeMode());
 
     // FUSB CC pin dis connect
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_10, GPIO_PIN_RESET);

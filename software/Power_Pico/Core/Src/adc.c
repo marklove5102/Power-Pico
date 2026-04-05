@@ -28,7 +28,7 @@
 #include "gate.h"
 #include "user_TasksInit.h"
 
-// DMA 双缓冲原始数据 [200行][5列]
+// DMA 双缓冲原始数据
 uint16_t adc_raw_buffer[ADC_TIMES * 2][ADC_CHANNELS];
 // USB 发送缓冲区 (Ping-Pong 双缓冲防止发送冲突)
 USB_ADC_Packet_t usb_packet_buffer[2];
@@ -40,8 +40,6 @@ static uint8_t low_underload_cnt = 0;
 static uint8_t is_transition_next = 0;  // 标记下一包是否为过渡数据
 // 用于监视数据更新的计数器
 static uint32_t monitor_chunk_counter = 0;
-// uA 单位的偏置电流 (仅仅用于UI示数的)
-float cur_bias_uA = -0.0;
 
 /* USER CODE END 0 */
 
@@ -249,7 +247,7 @@ static void Data_Monitor_Update(uint16_t vol_adc, uint16_t cur_adc, uint16_t ref
 
     // 4. 计算最终校正后的电流
     // 注意：误差电流是正的，所以要从测量值中减去
-    float final_current_10na = current_10na - error_current_10na + cur_bias_uA*100.0f;
+    float final_current_10na = current_10na - error_current_10na;
 
     // 5. 累加数据 (此函数在中断上下文中被调用，Data_Monitor_Get_Values会处理中断保护)
     g_data_monitor.sum_vol_mv += (uint64_t)voltage_mv;
@@ -308,6 +306,7 @@ void Data_Monitor_Clear(void)
 void Process_ADC_Chunk(uint16_t *chunk_ptr, uint8_t packet_idx)
 {
     USB_ADC_Packet_t *pkg = &usb_packet_buffer[packet_idx];
+    uint8_t gate_mode = Gate_Get_Mode();
 
     // 填充包头
     pkg->header[0] = PACKET_HEADER_0;
@@ -318,6 +317,17 @@ void Process_ADC_Chunk(uint16_t *chunk_ptr, uint8_t packet_idx)
     // 获取当前物理档位
     uint8_t current_hw_range = Gate_get_status();
     uint8_t req_switch_range = current_hw_range; // 初始化请求切换的档位
+
+    if (gate_mode != GATE_MODE_AUTO) {
+        if (current_hw_range != gate_mode) {
+            flow_route_selection(gate_mode);
+            current_hw_range = gate_mode;
+        }
+        req_switch_range = current_hw_range;
+        is_transition_next = 0;
+        high_overload_cnt = 0;
+        low_underload_cnt = 0;
+    }
 
     // 如果上一包触发了切换，本包数据是在切换期间采集的“脏数据”，必须丢弃
     if (is_transition_next) {
@@ -339,57 +349,59 @@ void Process_ADC_Chunk(uint16_t *chunk_ptr, uint8_t packet_idx)
         uint16_t raw_hig = sample_row[IDX_HIGH];
         uint16_t raw_ref = sample_row[IDX_REF];
 
-        // --- 基于当前物理档位，进行独立的切换决策 ---
-        switch (current_hw_range)
-        {
-            case LOW_CUR:
-                // 在LOW档，只关心raw_low是否过载
-                if (abs(raw_low-raw_ref) >= THRESH_HIGH) {
-                    high_overload_cnt++;
-                    if (high_overload_cnt >= THRESH_TIMES) {
-                        req_switch_range = MID_CUR; // 请求升到MID档
+        // --- AUTO 档基于当前物理档位进行切换决策 ---
+        if (gate_mode == GATE_MODE_AUTO) {
+            switch (current_hw_range)
+            {
+                case LOW_CUR:
+                    // 在LOW档，只关心raw_low是否过载
+                    if (abs(raw_low-raw_ref) >= THRESH_HIGH) {
+                        high_overload_cnt++;
+                        if (high_overload_cnt >= THRESH_TIMES) {
+                            req_switch_range = MID_CUR; // 请求升到MID档
+                        }
+                    } else {
+                        high_overload_cnt = 0;
                     }
-                } else {
-                    high_overload_cnt = 0;
-                }
-                // LOW档不存在欠载问题
-                low_underload_cnt = 0;
-                break;
-
-            case MID_CUR:
-                // 在MID档，判断raw_mid是否过载或欠载
-                if (abs(raw_mid-raw_ref) >= THRESH_HIGH) { // 过载
-                    high_overload_cnt++;
-                    if (high_overload_cnt >= THRESH_TIMES) {
-                        req_switch_range = HIGH_CUR; // 请求升到HIGH档
-                    }
-                } else {
-                    high_overload_cnt = 0;
-                }
-
-                if (abs(raw_mid-raw_ref) < THRESH_LOW) { // 欠载
-                    low_underload_cnt++;
-                    if (low_underload_cnt >= THRESH_TIMES) {
-                        req_switch_range = LOW_CUR; // 请求降到LOW档
-                    }
-                } else {
+                    // LOW档不存在欠载问题
                     low_underload_cnt = 0;
-                }
-                break;
+                    break;
 
-            case HIGH_CUR:
-                // 在HIGH档，只关心raw_hig是否欠载
-                if (abs(raw_hig-raw_ref) < THRESH_LOW) { // 注意：这里用raw_hig判断
-                    low_underload_cnt++;
-                    if (low_underload_cnt >= THRESH_TIMES) {
-                        req_switch_range = MID_CUR; // 请求降到MID档
+                case MID_CUR:
+                    // 在MID档，判断raw_mid是否过载或欠载
+                    if (abs(raw_mid-raw_ref) >= THRESH_HIGH) { // 过载
+                        high_overload_cnt++;
+                        if (high_overload_cnt >= THRESH_TIMES) {
+                            req_switch_range = HIGH_CUR; // 请求升到HIGH档
+                        }
+                    } else {
+                        high_overload_cnt = 0;
                     }
-                } else {
-                    low_underload_cnt = 0;
-                }
-                // HIGH档不存在过载问题
-                high_overload_cnt = 0;
-                break;
+
+                    if (abs(raw_mid-raw_ref) < THRESH_LOW) { // 欠载
+                        low_underload_cnt++;
+                        if (low_underload_cnt >= THRESH_TIMES) {
+                            req_switch_range = LOW_CUR; // 请求降到LOW档
+                        }
+                    } else {
+                        low_underload_cnt = 0;
+                    }
+                    break;
+
+                case HIGH_CUR:
+                    // 在HIGH档，只关心raw_hig是否欠载
+                    if (abs(raw_hig-raw_ref) < THRESH_LOW) { // 注意：这里用raw_hig判断
+                        low_underload_cnt++;
+                        if (low_underload_cnt >= THRESH_TIMES) {
+                            req_switch_range = MID_CUR; // 请求降到MID档
+                        }
+                    } else {
+                        low_underload_cnt = 0;
+                    }
+                    // HIGH档不存在过载问题
+                    high_overload_cnt = 0;
+                    break;
+            }
         }
 
         // 如果已经做出切换决定，立即跳出循环
@@ -420,7 +432,7 @@ void Process_ADC_Chunk(uint16_t *chunk_ptr, uint8_t packet_idx)
     pkg->data_count = i;
 
     // --- 循环结束后，执行物理切换 ---
-    if (req_switch_range != current_hw_range)
+    if (gate_mode == GATE_MODE_AUTO && req_switch_range != current_hw_range)
     {
         flow_route_selection(req_switch_range); // 执行物理切换
         is_transition_next = 1; // 标记下一包是过渡数据
