@@ -30,6 +30,7 @@ uint8_t ui_get_back_light_level(void);
 bool ui_get_key_sound_enable(void);
 uint8_t ui_get_language_select(void);
 uint16_t ui_get_display_rotation(void);
+uint8_t ui_get_current_range_mode(void);
 void ui_get_vol_cur(float *voltage, float *current);
 
 // set functions
@@ -39,6 +40,7 @@ void ui_set_back_light_level(uint8_t level);
 void ui_set_key_sound_enable(bool enable);
 void ui_set_language_select(uint8_t lang);
 void ui_set_display_rotation(uint16_t rotation);
+void ui_set_current_range_mode(uint8_t mode);
 void ui_update_vol_cur_varables(float voltage, float current);
 void ui_clear_data_monitor(void);
 

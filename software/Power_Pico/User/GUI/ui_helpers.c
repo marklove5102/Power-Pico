@@ -4,6 +4,7 @@
 #include "BL24C02.h" // system settings
 #include "tim.h"     // elapsed time
 #include "adc.h"     //  for voltage/current minitor
+#include "gate.h"    // for current range mode control
 #include "user_PDUFPTask.h" // comunicate with PD UFP Task
 
 #include "./ui_helpers.h"
@@ -63,6 +64,10 @@ uint16_t ui_get_display_rotation(void) {
     return Sys_Get_Rotation();
 }
 
+uint8_t ui_get_current_range_mode(void) {
+    return Sys_Get_CurrentRangeMode();
+}
+
 // 获取当前电压, 单位 V; 当前电流, 单位 uA
 void ui_get_vol_cur(float *voltage, float *current) {
     if (voltage != NULL) {
@@ -93,6 +98,11 @@ void ui_set_language_select(uint8_t lang) {
 
 void ui_set_display_rotation(uint16_t rotation) {
     Sys_Set_Rotation(rotation);
+}
+
+void ui_set_current_range_mode(uint8_t mode) {
+    Sys_Set_CurrentRangeMode(mode);
+    Gate_Set_Mode(mode);
 }
 
 // 设置 UI 层的电压电流变量, 供 UI 层显示使用, 单位分别为 V 和 uA

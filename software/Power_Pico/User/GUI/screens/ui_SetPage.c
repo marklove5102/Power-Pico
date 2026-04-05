@@ -23,6 +23,10 @@ static lv_obj_t * ui_LabelLang = NULL;
 static lv_obj_t * ui_PanelRotate = NULL;
 static lv_obj_t * ui_LabelRotation = NULL;
 static lv_obj_t * ui_LabelRotNum = NULL;
+// current range mode
+static lv_obj_t * ui_PanelRange = NULL;
+static lv_obj_t * ui_LabelRange = NULL;
+static lv_obj_t * ui_LabelRangeMode = NULL;
 // enable PPS, goto PPS page
 static lv_obj_t * ui_PanelPPS = NULL;
 static lv_obj_t * ui_SwitchPPS = NULL;
@@ -37,13 +41,27 @@ static lv_obj_t * msgbox = NULL;  // msgbox 对象
 static lv_obj_t * spinner = NULL; // spinner 对象
 static bool waiting_for_signal = false; // 标志位，表示是否在等待信号
 
-static lv_obj_t * panels[6]; // 存储所有 panel 的指针
+static lv_obj_t * panels[7]; // 存储所有 panel 的指针
 static int current_panel_index = 0; // 当前选中的 panel 索引
 
 static void show_wait_msgbox(void);
 static void hide_wait_msgbox(void);
 static void show_fail_msgbox(void);
 static void show_restart_msgbox(void);
+
+#include "gate.h"
+static void _set_range_label_text(uint8_t mode)
+{
+    if (mode == GATE_MODE_AUTO) {
+        lv_label_set_text(ui_LabelRangeMode, _("AUTO"));
+    } else if (mode == GATE_MODE_LOW) {
+        lv_label_set_text(ui_LabelRangeMode, _("LOW"));
+    } else if (mode == GATE_MODE_MID) {
+        lv_label_set_text(ui_LabelRangeMode, _("MID"));
+    } else {
+        lv_label_set_text(ui_LabelRangeMode, _("HIGH"));
+    }
+}
 
 // event funtions
 
@@ -177,8 +195,25 @@ void ui_set_page_key_handler(void *key_event)
                 ui_full_screen_refresh(ui_SetPage);
                 break;
 
-            // PPS page
+            // current range
             case 4:
+            {
+                uint8_t mode = ui_get_current_range_mode();
+                if (((key_event_t*)key_event)->id == KEY_ID_Y && ((key_event_t*)key_event)->type == KEY_EVT_CLICK)
+                {
+                    mode = (mode + 1U) % 4U;
+                }
+                else if (((key_event_t*)key_event)->id == KEY_ID_N && ((key_event_t*)key_event)->type == KEY_EVT_CLICK)
+                {
+                    mode = (mode + 3U) % 4U;
+                }
+                ui_set_current_range_mode(mode);
+                _set_range_label_text(mode);
+                break;
+            }
+
+            // PPS page
+            case 5:
                 // 发送开启PD诱骗的信号
                 if (((key_event_t*)key_event)->id == KEY_ID_Y && ((key_event_t*)key_event)->type == KEY_EVT_CLICK)
                 {
@@ -189,8 +224,9 @@ void ui_set_page_key_handler(void *key_event)
                     // lv_lib_pm_goto("PPS Page", NULL);
                 }
                 break;
+
             // about
-            case 5:
+            case 6:
                 // do nothing
                 break;
         }
@@ -234,6 +270,8 @@ static void _setting_init(void) {
     } else if (rotation == 270) {
         lv_label_set_text(ui_LabelRotNum, "< 270 >");
     }
+
+    _set_range_label_text(ui_get_current_range_mode());
 }
 
 /////////////////////// ui_components //////////////////////
@@ -460,11 +498,42 @@ void ui_SetPage_screen_init(void)
     lv_label_set_text(ui_LabelRotNum, "< 180 >");
     lv_obj_set_style_text_font(ui_LabelRotNum, &lv_font_montserrat_16, LV_PART_MAIN | LV_STATE_DEFAULT);
 
+    ui_PanelRange = lv_obj_create(ui_SetPage);
+    lv_obj_set_width(ui_PanelRange, 234);
+    lv_obj_set_height(ui_PanelRange, 45);
+    lv_obj_set_x(ui_PanelRange, 0);
+    lv_obj_set_y(ui_PanelRange, 225);
+    lv_obj_set_align(ui_PanelRange, LV_ALIGN_TOP_MID);
+    lv_obj_add_flag(ui_PanelRange, LV_OBJ_FLAG_CHECKABLE);
+    lv_obj_remove_flag(ui_PanelRange, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_style_bg_color(ui_PanelRange, lv_color_hex(0x606060), LV_PART_MAIN | LV_STATE_CHECKED);
+    lv_obj_set_style_bg_opa(ui_PanelRange, 255, LV_PART_MAIN | LV_STATE_CHECKED);
+
+    ui_LabelRange = lv_label_create(ui_PanelRange);
+    lv_obj_set_width(ui_LabelRange, LV_SIZE_CONTENT);
+    lv_obj_set_height(ui_LabelRange, LV_SIZE_CONTENT);
+    lv_obj_set_align(ui_LabelRange, LV_ALIGN_LEFT_MID);
+    lv_label_set_text(ui_LabelRange, _("Current Range"));
+    if(ui_get_language_select() == 0)
+        lv_obj_set_style_text_font(ui_LabelRange, &lv_font_montserrat_16, LV_PART_MAIN | LV_STATE_DEFAULT);
+    else
+        lv_obj_set_style_text_font(ui_LabelRange, &ui_font_zhongyuan18, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_LabelRangeMode = lv_label_create(ui_PanelRange);
+    lv_obj_set_width(ui_LabelRangeMode, LV_SIZE_CONTENT);
+    lv_obj_set_height(ui_LabelRangeMode, LV_SIZE_CONTENT);
+    lv_obj_set_align(ui_LabelRangeMode, LV_ALIGN_RIGHT_MID);
+    lv_label_set_text(ui_LabelRangeMode, _("AUTO"));
+    if(ui_get_language_select() == 0)
+        lv_obj_set_style_text_font(ui_LabelRangeMode, &lv_font_montserrat_18, LV_PART_MAIN | LV_STATE_DEFAULT);
+    else
+        lv_obj_set_style_text_font(ui_LabelRangeMode, &ui_font_zhongyuan18, LV_PART_MAIN | LV_STATE_DEFAULT);
+
     ui_PanelPPS = lv_obj_create(ui_SetPage);
     lv_obj_set_width(ui_PanelPPS, 234);
     lv_obj_set_height(ui_PanelPPS, 45);
     lv_obj_set_x(ui_PanelPPS, 0);
-    lv_obj_set_y(ui_PanelPPS, 225);
+    lv_obj_set_y(ui_PanelPPS, 275);
     lv_obj_set_align(ui_PanelPPS, LV_ALIGN_TOP_MID);
     lv_obj_add_flag(ui_PanelPPS, LV_OBJ_FLAG_CHECKABLE);     /// Flags
     lv_obj_remove_flag(ui_PanelPPS, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
@@ -480,7 +549,7 @@ void ui_SetPage_screen_init(void)
     lv_obj_set_width(ui_LabelPPS, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_LabelPPS, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_align(ui_LabelPPS, LV_ALIGN_LEFT_MID);
-    lv_label_set_text(ui_LabelPPS, _("PD Sink"));
+    lv_label_set_text(ui_LabelPPS, _("PPS Sink"));
     if(ui_get_language_select() == 0)
         lv_obj_set_style_text_font(ui_LabelPPS, &lv_font_montserrat_18, LV_PART_MAIN | LV_STATE_DEFAULT);
     else
@@ -490,7 +559,7 @@ void ui_SetPage_screen_init(void)
     lv_obj_set_width(ui_PanelAbout, 234);
     lv_obj_set_height(ui_PanelAbout, 100);
     lv_obj_set_x(ui_PanelAbout, 0);
-    lv_obj_set_y(ui_PanelAbout, 275);
+    lv_obj_set_y(ui_PanelAbout, 325);
     lv_obj_set_align(ui_PanelAbout, LV_ALIGN_TOP_MID);
     lv_obj_add_flag(ui_PanelAbout, LV_OBJ_FLAG_CHECKABLE);     /// Flags
     lv_obj_remove_flag(ui_PanelAbout, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
@@ -500,7 +569,9 @@ void ui_SetPage_screen_init(void)
     ui_LabelAbout = lv_label_create(ui_PanelAbout);
     lv_obj_set_width(ui_LabelAbout, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_LabelAbout, LV_SIZE_CONTENT);    /// 1
-    lv_label_set_text(ui_LabelAbout, "About\nPower-Pico\nThe uA current meter\nV 1.0.9");
+    char str_buf[64];
+    sprintf(str_buf, "About\nPower-Pico\nThe uA current meter\nV %d.%d.%d", pp_version_major(), pp_version_minor(), pp_version_patch());
+    lv_label_set_text(ui_LabelAbout, str_buf);
     lv_obj_set_style_text_font(ui_LabelAbout, &lv_font_montserrat_16, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     // init setting values
@@ -511,8 +582,9 @@ void ui_SetPage_screen_init(void)
     panels[1] = ui_PanelKS;
     panels[2] = ui_PanelLang;
     panels[3] = ui_PanelRotate;
-    panels[4] = ui_PanelPPS;
-    panels[5] = ui_PanelAbout;
+    panels[4] = ui_PanelRange;
+    panels[5] = ui_PanelPPS;
+    panels[6] = ui_PanelAbout;
     lv_obj_add_state(panels[current_panel_index], LV_STATE_CHECKED);
 
     // timer
