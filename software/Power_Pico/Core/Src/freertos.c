@@ -45,6 +45,8 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
+volatile const char *g_overflow_task_name = 0;
+volatile TaskHandle_t g_overflow_task_handle = 0;
 
 /* USER CODE END Variables */
 /* Definitions for defaultTask */
@@ -67,6 +69,7 @@ void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
 /* Hook prototypes */
 void vApplicationTickHook(void);
+void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName);
 
 /* USER CODE BEGIN 3 */
 void vApplicationTickHook( void )
@@ -77,6 +80,21 @@ void vApplicationTickHook( void )
    code must not attempt to block, and only the interrupt safe FreeRTOS API
    functions can be used (those that end in FromISR()). */
   TaskTickHook();
+}
+
+void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName)
+{
+  g_overflow_task_handle = xTask;
+  g_overflow_task_name = pcTaskName;
+
+  taskDISABLE_INTERRUPTS();
+
+  /* Set a breakpoint here to inspect pcTaskName and call stack. */
+  __BKPT(0);
+
+  for(;;)
+  {
+  }
 }
 /* USER CODE END 3 */
 
