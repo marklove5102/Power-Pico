@@ -12,7 +12,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 
-/* 10kHz / 100 / 10 = 10Hz UI data refresh rate */
+/* 10kHz / ADC_TIMES / UI_UPDATE_DIV  UI data refresh rate */
 #define UI_UPDATE_DIV 10
 
 /* Private function prototypes -----------------------------------------------*/

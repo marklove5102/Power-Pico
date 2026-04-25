@@ -36,7 +36,7 @@ osTimerId_t IdleTimerHandle;
 // Hardwares initialization
 osThreadId_t HardwareInitTaskHandle;
 const osThreadAttr_t HardwareInitTask_attributes = {
-  .name = "HardwareInitTask",
+  .name = "HwInitTask",
   .stack_size = 128 * 10,
   .priority = (osPriority_t) osPriorityHigh,
 };
@@ -44,15 +44,15 @@ const osThreadAttr_t HardwareInitTask_attributes = {
 // message receive task
 osThreadId_t MessageReceiveTaskHandle;
 const osThreadAttr_t MessageReceiveTask_attributes = {
-  .name = "MessageReceiveTask",
-  .stack_size = 128 * 1,
+  .name = "MsgRecTask",
+  .stack_size = 128 * 2,
   .priority = (osPriority_t) osPriorityNormal2,
 };
 
 // message send task
 osThreadId_t MessageSendTaskHandle;
 const osThreadAttr_t MessageSendTask_attributes = {
-  .name = "MessageSendTask",
+  .name = "MsgSendTask",
   .stack_size = 128 * 8,
   .priority = (osPriority_t) osPriorityHigh,
 };
@@ -61,7 +61,7 @@ const osThreadAttr_t MessageSendTask_attributes = {
 osThreadId_t KeyTaskHandle;
 const osThreadAttr_t KeyTask_attributes = {
   .name = "KeyTask",
-  .stack_size = 128 * 1,
+  .stack_size = 128 * 2,
   .priority = (osPriority_t) osPriorityNormal,
 };
 
@@ -77,7 +77,7 @@ const osThreadAttr_t PDUFPTask_attributes = {
 osThreadId_t LvHandlerTaskHandle;
 const osThreadAttr_t LvHandlerTask_attributes = {
   .name = "LvHandlerTask",
-  .stack_size = 128 * 24,
+  .stack_size = 128 * 32,
   .priority = (osPriority_t) osPriorityLow1,
 };
 
